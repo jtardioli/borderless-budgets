@@ -20,6 +20,7 @@ import {
   TransactionType,
 } from "~/schemas/transactions";
 import { formatCurrency } from "~/utils/currency";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 const emptyTransaction = {
   description: "",
@@ -41,6 +42,7 @@ function getCurrentMonth() {
 }
 
 const Home: NextPage = () => {
+  const { data: session } = useSession({ required: true });
   const utils = api.useContext();
   const { data: transactions } = api.transactions.getAll.useQuery();
   const { data: monthlyExpenditure } =
@@ -142,9 +144,34 @@ const Home: NextPage = () => {
   return (
     <div className="flex h-screen w-screen ">
       <div className="flex h-full w-56 flex-col items-center justify-start bg-slate-100 bg-gradient-to-br py-[10%] drop-shadow-md">
-        <div className="flex items-center">
-          <AiFillHome size={30} className="mr-4 text-indigo-600" />
-          <h2 className="text-lg ">Dashboard</h2>
+        <div className="flex flex-col items-center">
+          {session && (
+            <div>
+              <h2 className="text-lg ">{session.user.email}</h2>
+              <button
+                className="h-10 w-28  rounded-md bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 shadow-inner"
+                onClick={() => {
+                  void signOut();
+                }}
+              >
+                sign out
+              </button>
+            </div>
+          )}
+          {!session && (
+            <button
+              className="h-10 w-28  rounded-md bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 shadow-inner"
+              onClick={() => {
+                void signIn();
+              }}
+            >
+              sign in
+            </button>
+          )}
+          <div className="flex">
+            <AiFillHome size={30} className="mr-4 text-indigo-600" />
+            <h2 className="text-lg ">Dashboard</h2>
+          </div>
         </div>
       </div>
       <main className="flex h-full w-full flex-col gap-6 bg-slate-200 px-10 py-5">
