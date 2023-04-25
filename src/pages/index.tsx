@@ -7,8 +7,6 @@ import {
   startOfMonth as getStartOfMonth,
 } from "date-fns";
 
-import { AiFillHome } from "react-icons/ai";
-
 import { RiDeleteBinFill } from "react-icons/ri";
 import { GiExpense, GiReceiveMoney } from "react-icons/gi";
 
@@ -20,7 +18,9 @@ import {
   TransactionType,
 } from "~/schemas/transactions";
 import { formatCurrency } from "~/utils/currency";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import Layout from "~/components/Layout";
+import Skeleton from "~/components/Skeleton";
 
 const emptyTransaction = {
   description: "",
@@ -44,9 +44,14 @@ function getCurrentMonth() {
 const Home: NextPage = () => {
   const { data: session } = useSession({ required: true });
   const utils = api.useContext();
-  const { data: transactions } = api.transactions.getAll.useQuery();
+  const { data: transactions } = api.transactions.getAll.useQuery(
+    undefined, // no input
+    { enabled: session?.user !== undefined }
+  );
   const { data: monthlyExpenditure } =
-    api.transactions.getMonthlyExpenditure.useQuery(getCurrentMonth());
+    api.transactions.getMonthlyExpenditure.useQuery(getCurrentMonth(), {
+      enabled: session?.user !== undefined,
+    });
   const createTx = api.transactions.create.useMutation({
     async onSuccess(input) {
       await utils.transactions.invalidate();
@@ -127,7 +132,7 @@ const Home: NextPage = () => {
             </p>
             <div className="flex flex-[1] items-center justify-end">
               <RiDeleteBinFill
-                className="text-gray-900 "
+                className="text-gray-900 hover:text-red-800"
                 onClick={() => {
                   deleteTx.mutate({ id: tx.id });
                 }}
@@ -142,55 +147,21 @@ const Home: NextPage = () => {
   }
 
   return (
-    <div className="flex h-screen w-screen ">
-      <div className="flex h-full w-56 flex-col items-center justify-start bg-slate-100 bg-gradient-to-br py-[10%] drop-shadow-md">
-        <div className="flex flex-col items-center">
-          {session && (
-            <div>
-              <h2 className="text-lg ">{session.user.email}</h2>
-              <button
-                className="h-10 w-28  rounded-md bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 shadow-inner"
-                onClick={() => {
-                  void signOut();
-                }}
-              >
-                sign out
-              </button>
-            </div>
-          )}
-          {!session && (
-            <button
-              className="h-10 w-28  rounded-md bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 shadow-inner"
-              onClick={() => {
-                void signIn();
-              }}
-            >
-              sign in
-            </button>
-          )}
-          <div className="flex">
-            <AiFillHome size={30} className="mr-4 text-indigo-600" />
-            <h2 className="text-lg ">Dashboard</h2>
-          </div>
-        </div>
-      </div>
+    <Layout>
       <main className="flex h-full w-full flex-col gap-6 bg-slate-200 px-10 py-5">
         <section className="flex h-[200px] items-center gap-10 rounded-md border-[1px] border-gray-300 bg-white px-8">
-          <div className="flex  h-[100px] w-[250px] flex-col  items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
-            <p>Total Balaaaance:</p>
+          <div className="flex h-[100px] w-[220px] flex-col items-center  justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
+            <p>Total Balance</p>
             <p className="text-ellipsis text-2xl">
               {formatCurrency(balance!, "USD")}
             </p>
           </div>
-          <div className="flex h-[100px] w-[250px] flex-col  items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
-            <p>Monthly Expenditure:</p>
+
+          <div className="flex h-[100px] w-[220px] flex-col  items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
+            <p>Monthly Expenditure</p>
             <p className="text-2xl">
               {formatCurrency(monthlyExpenditure!, "USD")}
             </p>
-          </div>
-          <div className="flex h-[100px] w-[250px] flex-col  items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
-            <p>Monthly Income:</p>
-            <p className="text-2xl">{formatCurrency(balance!, "USD")}</p>
           </div>
         </section>
 
@@ -198,6 +169,7 @@ const Home: NextPage = () => {
           {/* Transactions */}
           <div className="flex-[2]">
             <h1 className="p-8 py-2 text-gray-700">Recent Transactions</h1>
+
             <div className="h-[500px]  overflow-y-auto  rounded-md border-[1px] border-gray-300 bg-white py-4 drop-shadow-sm">
               {renderTransactions()}
             </div>
@@ -292,7 +264,7 @@ const Home: NextPage = () => {
           </div>
         </section>
       </main>
-    </div>
+    </Layout>
   );
 };
 
