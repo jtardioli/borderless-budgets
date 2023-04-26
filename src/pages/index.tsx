@@ -155,7 +155,7 @@ const Home: NextPage = () => {
     <Layout>
       <main className="flex h-full w-full flex-col gap-6 bg-slate-200 px-10 py-5">
         <section className="flex h-[200px] items-center gap-10 rounded-md border-[1px] border-gray-300 bg-white px-8">
-          <div className="flex h-[100px] w-[220px] flex-col items-center  justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
+          <div className=" flex h-[100px] w-[220px] flex-col items-center justify-center  overflow-hidden overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
             {balance != null ? (
               <>
                 <p>Total Balance</p>
@@ -168,7 +168,7 @@ const Home: NextPage = () => {
             )}
           </div>
 
-          <div className="flex h-[100px] w-[220px] flex-col  items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
+          <div className="flex h-[100px] w-[220px] flex-col items-center  justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
             {monthlyExpenditure != null ? (
               <>
                 <p>Monthly Expenditure</p>
@@ -319,27 +319,3 @@ const Home: NextPage = () => {
 };
 
 export default Home;
-
-// const AuthShowcase: React.FC = () => {
-//   const { data: sessionData } = useSession();
-
-//   const { data: secretMessage } = api.example.getSecretMessage.useQuery(
-//     undefined, // no input
-//     { enabled: sessionData?.user !== undefined }
-//   );
-
-//   return (
-//     <div className="flex flex-col items-center justify-center gap-4">
-//       <p className="text-center text-2xl text-white">
-//         {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
-//         {secretMessage && <span> - {secretMessage}</span>}
-//       </p>
-//       <button
-//         className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-//         onClick={sessionData ? () => void signOut() : () => void signIn()}
-//       >
-//         {sessionData ? "Sign out" : "Sign in"}
-//       </button>
-//     </div>
-//   );
-// };
