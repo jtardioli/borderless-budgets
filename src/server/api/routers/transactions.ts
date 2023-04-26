@@ -22,6 +22,23 @@ export const transactionsRouter = createTRPCRouter({
       ],
     });
   }),
+  getBalance: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.prisma.user.findUnique({
+      where: {
+        id: ctx.session.user.id,
+      },
+      select: {
+        balance: true,
+      },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Return the user's balance
+    return user.balance;
+  }),
   getMonthlyExpenditure: protectedProcedure
     .input(
       z.object({
@@ -96,25 +113,63 @@ export const transactionsRouter = createTRPCRouter({
   create: protectedProcedure
     .input(TransactionWithoutIdSchema)
     .mutation(async ({ input, ctx }) => {
+      const isExpense = input.type === TransactionType.EXPENSE;
+      const isIncome = input.type === TransactionType.INCOME;
+
+      // Prepare the balance update operation
+      const balanceOperation = isExpense
+        ? { decrement: input.amount }
+        : isIncome
+        ? { increment: input.amount }
+        : undefined;
+
+      // Create the transaction
       const tx = await ctx.prisma.transaction.create({
         data: { ...input, userId: ctx.session?.user.id },
       });
 
+      // Conditionally update the user's balance if the transaction is created and a balanceOperation exists
+      if (tx && balanceOperation) {
+        await ctx.prisma.user.update({
+          where: { id: ctx.session?.user.id },
+          data: { balance: balanceOperation },
+        });
+      }
+
       return tx;
     }),
+
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const deleteTx = await ctx.prisma.transaction.deleteMany({
+      const deleteTx = await ctx.prisma.transaction.delete({
         where: {
-          id: {
-            equals: input.id,
-          },
-          userId: {
-            equals: ctx.session.user.id,
-          },
+          id: input.id,
+        },
+        select: {
+          type: true,
+          amount: true,
         },
       });
+
+      const isExpense = deleteTx.type === TransactionType.EXPENSE;
+      const isIncome = deleteTx.type === TransactionType.INCOME;
+
+      // Prepare the balance update operation
+      const balanceOperation = isExpense
+        ? { increment: deleteTx.amount }
+        : isIncome
+        ? { decrement: deleteTx.amount }
+        : undefined;
+
+      // Conditionally update the user's balance if the transaction is created and a balanceOperation exists
+      if (deleteTx && balanceOperation) {
+        await ctx.prisma.user.update({
+          where: { id: ctx.session?.user.id },
+          data: { balance: balanceOperation },
+        });
+      }
+
       return deleteTx;
     }),
 });

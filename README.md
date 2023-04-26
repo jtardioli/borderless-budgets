@@ -8,6 +8,9 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 
 ## Todo
 
-[ ] switch routes to protected
-[ ] add balance to user table
+[x] switch routes to protected
+[x] year in review
+[x] add balance to user table
+[ ] add other currencies
+[ ] add investment tracker page
 [ ] expense category chart

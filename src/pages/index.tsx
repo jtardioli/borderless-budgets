@@ -20,7 +20,20 @@ import {
 import { formatCurrency } from "~/utils/currency";
 import { useSession } from "next-auth/react";
 import Layout from "~/components/Layout";
-import Skeleton from "~/components/Skeleton";
+import {
+  BallTriangle,
+  Bars,
+  Circles,
+  Grid,
+  Hearts,
+  Oval,
+  Puff,
+  Rings,
+  SpinningCircles,
+  TailSpin,
+  ThreeDots,
+  Audio,
+} from "react-loading-icons";
 
 const emptyTransaction = {
   description: "",
@@ -48,6 +61,12 @@ const Home: NextPage = () => {
     undefined, // no input
     { enabled: session?.user !== undefined }
   );
+  const { data: balance } = api.transactions.getBalance.useQuery(
+    undefined, // no input,
+    {
+      enabled: session?.user !== undefined,
+    }
+  );
   const { data: monthlyExpenditure } =
     api.transactions.getMonthlyExpenditure.useQuery(getCurrentMonth(), {
       enabled: session?.user !== undefined,
@@ -63,18 +82,6 @@ const Home: NextPage = () => {
       await utils.transactions.invalidate();
     },
   });
-
-  const balance = transactions?.reduce((prev, cur) => {
-    if (cur.type === TransactionType.EXPENSE) {
-      return prev - cur.amount;
-    }
-
-    if (cur.type === TransactionType.INCOME) {
-      return prev + cur.amount;
-    }
-
-    return 0;
-  }, 0); // Don't forget to provide the initial value for the accumulator
 
   const [formData, setFormData] = useState<TransactionNew>(emptyTransaction);
 
@@ -131,14 +138,18 @@ const Home: NextPage = () => {
               {format(new Date(tx.date), "dd/MM/yyyy ")}
             </p>
             <div className="flex flex-[1] items-center justify-end">
-              <RiDeleteBinFill
-                className="text-gray-900 hover:text-red-800"
-                onClick={() => {
-                  deleteTx.mutate({ id: tx.id });
-                }}
-                style={{ cursor: "pointer" }}
-                size={23}
-              />
+              {deleteTx.isLoading && deleteTx?.variables?.id === tx.id ? (
+                <Oval stroke="#C53030" width="20px" />
+              ) : (
+                <RiDeleteBinFill
+                  className="text-gray-900 hover:text-red-800"
+                  onClick={() => {
+                    deleteTx.mutate({ id: tx.id });
+                  }}
+                  style={{ cursor: "pointer" }}
+                  size={23}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -257,8 +268,11 @@ const Home: NextPage = () => {
                 />
               </div>
 
-              <button className="h-10 rounded-md bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 shadow-inner">
-                Add Expense
+              <button
+                className="flex h-10 items-center justify-center rounded-md bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 shadow-inner"
+                disabled={createTx.isLoading}
+              >
+                {createTx.isLoading ? <Oval width="28px" /> : "Add Expense "}
               </button>
             </form>
           </div>
