@@ -4,11 +4,17 @@ import { CurrencyCode } from "~/config/currencyExchange";
 export enum TransactionCategory {
   HOUSING = "Housing and Utilities",
   TRANSPORTATION = "Transportation",
+  TRAVEL = "Travel",
   GROCERIES = "Groceries",
-  EATING_OUT = "Eating out",
+  RESTAURANT = "Restaurant",
   ENTERTAINMENT = "Entertainment",
   SUBSCRIPTIONS = "Subscriptions",
   HEALTH = "Health",
+  PERSONAL_CARE = "Personal Care",
+  CLOTHING = "Clothing",
+  GIFTS_AND_DONATIONS = "Gifts and Donations",
+  EDUCATION = "Education",
+  TAXES = "Taxes",
   MISC = "Misc",
 }
 
