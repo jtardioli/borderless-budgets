@@ -63,7 +63,7 @@ export const transactionsRouter = createTRPCRouter({
         },
       });
 
-      return result._sum.amount ? result._sum.amount * -1 : null;
+      return result._sum.amount ? result._sum.amount * -1 : 0;
     }),
   getYearInReview: protectedProcedure.query(async ({ ctx }) => {
     // Get the start date of the previous year

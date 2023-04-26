@@ -20,21 +20,9 @@ import {
 import { formatCurrency } from "~/utils/currency";
 import { useSession } from "next-auth/react";
 import Layout from "~/components/Layout";
-import {
-  BallTriangle,
-  Bars,
-  Circles,
-  Grid,
-  Hearts,
-  Oval,
-  Puff,
-  Rings,
-  SpinningCircles,
-  TailSpin,
-  ThreeDots,
-  Audio,
-} from "react-loading-icons";
+import { Oval } from "react-loading-icons";
 import { CurrencyCode } from "~/config/currencyExchange";
+import Skeleton from "~/components/Skeleton";
 
 const emptyTransaction = {
   description: "",
@@ -73,6 +61,7 @@ const Home: NextPage = () => {
     api.transactions.getMonthlyExpenditure.useQuery(getCurrentMonth(), {
       enabled: session?.user !== undefined,
     });
+
   const createTx = api.transactions.create.useMutation({
     async onSuccess(input) {
       await utils.transactions.invalidate();
@@ -160,22 +149,36 @@ const Home: NextPage = () => {
     });
   }
 
+  console.log(monthlyExpenditure, "gg");
+
   return (
     <Layout>
       <main className="flex h-full w-full flex-col gap-6 bg-slate-200 px-10 py-5">
         <section className="flex h-[200px] items-center gap-10 rounded-md border-[1px] border-gray-300 bg-white px-8">
           <div className="flex h-[100px] w-[220px] flex-col items-center  justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
-            <p>Total Balance</p>
-            <p className="text-ellipsis text-2xl">
-              {formatCurrency(balance!, "USD")}
-            </p>
+            {balance != null ? (
+              <>
+                <p>Total Balance</p>
+                <p className="text-ellipsis text-2xl">
+                  {formatCurrency(balance, "USD")}
+                </p>
+              </>
+            ) : (
+              <Skeleton bg="bg-indigo-400" />
+            )}
           </div>
 
           <div className="flex h-[100px] w-[220px] flex-col  items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
-            <p>Monthly Expenditure</p>
-            <p className="text-2xl">
-              {formatCurrency(monthlyExpenditure!, "USD")}
-            </p>
+            {monthlyExpenditure != null ? (
+              <>
+                <p>Monthly Expenditure</p>
+                <p className="text-2xl">
+                  {formatCurrency(monthlyExpenditure, "USD")}
+                </p>
+              </>
+            ) : (
+              <Skeleton bg="bg-indigo-400" />
+            )}
           </div>
         </section>
 
@@ -185,6 +188,18 @@ const Home: NextPage = () => {
             <h1 className="p-8 py-2 text-gray-700">Recent Transactions</h1>
 
             <div className="h-[500px]  overflow-y-auto  rounded-md border-[1px] border-gray-300 bg-white py-4 drop-shadow-sm">
+              {!transactions &&
+                [...(Array(5) as number[])].map((_, i) => {
+                  return (
+                    <div
+                      key={i}
+                      className="mx-8 my-4 h-20 overflow-hidden rounded-md"
+                    >
+                      <Skeleton bg="bg-slate-200" />
+                    </div>
+                  );
+                })}
+
               {renderTransactions()}
             </div>
           </div>
@@ -257,7 +272,7 @@ const Home: NextPage = () => {
                     onChange={handleChange}
                   />
                   <select
-                    className="w-24 border-none bg-gradient-to-br from-indigo-600 to-indigo-500 text-center text-white shadow-inner outline-none"
+                    className="w-24 cursor-pointer border-none bg-gradient-to-br from-indigo-600 to-indigo-500 text-center text-white shadow-inner outline-none"
                     defaultValue={CurrencyCode.CAD}
                     id="currency"
                     name="currency"
