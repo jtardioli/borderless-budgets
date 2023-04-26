@@ -5,6 +5,8 @@ import {
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { z } from "zod";
 import { format, subYears, startOfYear } from "date-fns";
+import axios from "axios";
+import { CurrencyCode, convertCurrency } from "~/config/currencyExchange";
 
 type MonthlySummary = Record<string, { expenses: number; income: number }>;
 
@@ -116,6 +118,17 @@ export const transactionsRouter = createTRPCRouter({
       const isExpense = input.type === TransactionType.EXPENSE;
       const isIncome = input.type === TransactionType.INCOME;
 
+      // If user selected other currency, convert it to CAD
+      const amount =
+        input.currency === CurrencyCode.CAD
+          ? input.amount
+          : await convertCurrency(
+              input.currency,
+              CurrencyCode.CAD,
+              input.amount
+            );
+      input.amount = amount;
+
       // Prepare the balance update operation
       const balanceOperation = isExpense
         ? { decrement: input.amount }
@@ -123,9 +136,11 @@ export const transactionsRouter = createTRPCRouter({
         ? { increment: input.amount }
         : undefined;
 
-      // Create the transaction
+      // Create the transaction obj by excluding currency
+      console.log(input, amount);
+      const { currency, ...newTx } = input;
       const tx = await ctx.prisma.transaction.create({
-        data: { ...input, userId: ctx.session?.user.id },
+        data: { ...newTx, userId: ctx.session?.user.id },
       });
 
       // Conditionally update the user's balance if the transaction is created and a balanceOperation exists

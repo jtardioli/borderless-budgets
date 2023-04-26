@@ -11,7 +11,7 @@ import { RiDeleteBinFill } from "react-icons/ri";
 import { GiExpense, GiReceiveMoney } from "react-icons/gi";
 
 import { type NextPage } from "next";
-import { api } from "~/utils/api";
+import { api } from "~/config/api";
 import {
   TransactionCategory,
   type TransactionNew,
@@ -34,6 +34,7 @@ import {
   ThreeDots,
   Audio,
 } from "react-loading-icons";
+import { CurrencyCode } from "~/config/currencyExchange";
 
 const emptyTransaction = {
   description: "",
@@ -41,6 +42,7 @@ const emptyTransaction = {
   amount: 0,
   date: new Date(),
   type: TransactionType.EXPENSE,
+  currency: CurrencyCode.CAD,
 };
 
 function getCurrentMonth() {
@@ -74,6 +76,7 @@ const Home: NextPage = () => {
   const createTx = api.transactions.create.useMutation({
     async onSuccess(input) {
       await utils.transactions.invalidate();
+      setFormData(emptyTransaction);
     },
   });
 
@@ -96,15 +99,15 @@ const Home: NextPage = () => {
 
   function addExpense(e: FormEvent) {
     e.preventDefault();
-    const { description, category, amount, date, type } = formData;
+    const { description, category, amount, date, type, currency } = formData;
     createTx.mutate({
       description,
       category,
       amount: Number(amount),
       date,
       type,
+      currency,
     });
-    setFormData(emptyTransaction);
   }
 
   function renderTransactions() {
@@ -243,15 +246,33 @@ const Home: NextPage = () => {
                 <label className="mb-2 text-sm text-gray-500" htmlFor="amount">
                   Amount:
                 </label>
-                <input
-                  className="h-[40px] rounded-md border-[1px] border-gray-500 px-2 shadow-inner outline-none"
-                  placeholder="0.00"
-                  type="text"
-                  id="amount"
-                  name="amount"
-                  value={formData.amount === 0 ? "" : formData.amount}
-                  onChange={handleChange}
-                />
+                <div className="flex overflow-hidden rounded-md border-[1px] border-gray-500 bg-red-300">
+                  <input
+                    className="h-[40px] w-full   border-none  px-2 shadow-inner outline-none"
+                    placeholder="0.00"
+                    type="text"
+                    id="amount"
+                    name="amount"
+                    value={formData.amount === 0 ? "" : formData.amount}
+                    onChange={handleChange}
+                  />
+                  <select
+                    className="w-24 border-none bg-gradient-to-br from-indigo-600 to-indigo-500 text-center text-white shadow-inner outline-none"
+                    defaultValue={CurrencyCode.CAD}
+                    id="currency"
+                    name="currency"
+                    value={formData.currency}
+                    onChange={handleChange}
+                  >
+                    {Object.values(CurrencyCode).map((currency) => {
+                      return (
+                        <option key={currency} value={currency}>
+                          {currency}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
               </div>
 
               <div className="flex flex-col">

@@ -1,4 +1,5 @@
 import { type TypeOf, z } from "zod";
+import { CurrencyCode } from "~/config/currencyExchange";
 
 export enum TransactionCategory {
   HOUSING = "Housing and Utilities",
@@ -29,7 +30,7 @@ export const TransactionSchema = z.object({
 export const TransactionWithoutIdSchema = TransactionSchema.omit({
   id: true,
   createdAt: true,
-});
+}).merge(z.object({ currency: z.nativeEnum(CurrencyCode) }));
 
 // Create the TypeScript types from Zod schemas
 export type Transaction = TypeOf<typeof TransactionSchema>;

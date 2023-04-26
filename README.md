@@ -11,6 +11,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 [x] switch routes to protected
 [x] year in review
 [x] add balance to user table
+[x] add monthly balance monthly icome
 [ ] add other currencies
 [ ] add investment tracker page
 [ ] expense category chart

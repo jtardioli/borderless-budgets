@@ -1,7 +1,7 @@
 import { type NextPage } from "next";
 import React from "react";
 import Layout from "~/components/Layout";
-import { api } from "~/utils/api";
+import { api } from "~/config/api";
 import { formatCurrency } from "~/utils/currency";
 
 const YearInReview: NextPage = () => {

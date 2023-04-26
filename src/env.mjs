@@ -22,6 +22,7 @@ const server = z.object({
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
   JWT_SECRET: z.string().min(1),
+  CURRENCY_CONVERSION_SECRET: z.string().min(1),
 });
 
 /**
@@ -50,6 +51,7 @@ const processEnv = {
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
   JWT_SECRET: process.env.JWT_SECRET,
+  CURRENCY_CONVERSION_SECRET: process.env.CURRENCY_CONVERSION_SECRET,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 
