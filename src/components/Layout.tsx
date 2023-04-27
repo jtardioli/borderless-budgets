@@ -50,7 +50,7 @@ const Layout: FC<Props> = ({ children }) => {
                 <h2 className="mt-[2px] text-lg">Dashboard</h2>
               </div>
             </Link>
-            <Link href={`/monthly-report/${String(new Date())}`}>
+            <Link href={`/monthly-report/${String(new Date()) || ""}`}>
               <div className="flex py-2">
                 <BsFillPieChartFill
                   size={30}
