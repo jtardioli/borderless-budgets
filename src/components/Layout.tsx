@@ -5,6 +5,7 @@ import React, { type ReactNode, type FC } from "react";
 import { AiFillHome } from "react-icons/ai";
 import { IoMdSettings } from "react-icons/io";
 import { MdCalendarMonth } from "react-icons/md";
+import { BsFillPieChartFill } from "react-icons/bs";
 
 type Props = {
   children: ReactNode;
@@ -47,6 +48,15 @@ const Layout: FC<Props> = ({ children }) => {
               <div className="flex py-2">
                 <AiFillHome size={30} className="mr-4 text-indigo-600" />
                 <h2 className="mt-[2px] text-lg">Dashboard</h2>
+              </div>
+            </Link>
+            <Link href={`/monthly-report/${String(new Date())}`}>
+              <div className="flex py-2">
+                <BsFillPieChartFill
+                  size={30}
+                  className="mr-4 text-indigo-600"
+                />
+                <h2 className="mt-[2px] text-lg">Monthly Report</h2>
               </div>
             </Link>
             <Link href="/year-in-review">

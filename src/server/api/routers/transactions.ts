@@ -4,8 +4,7 @@ import {
 } from "~/schemas/transactions";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { z } from "zod";
-import { format, subYears, startOfYear } from "date-fns";
-import axios from "axios";
+import { format, subYears, startOfYear, startOfMonth } from "date-fns";
 import { CurrencyCode, convertCurrency } from "~/config/currencyExchange";
 
 type MonthlySummary = Record<string, { expenses: number; income: number }>;
@@ -64,6 +63,39 @@ export const transactionsRouter = createTRPCRouter({
       });
 
       return result._sum.amount ? result._sum.amount * -1 : 0;
+    }),
+  getMonthlyCategoryExpenditure: protectedProcedure
+    .input(
+      z.object({
+        startOfMonth: z.union([z.date(), z.string()]),
+        endOfMonth: z.union([z.date(), z.string()]),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const result = await ctx.prisma.transaction.groupBy({
+        by: ["category"],
+        where: {
+          userId: ctx.session.user.id,
+          type: TransactionType.EXPENSE,
+          date: {
+            gte: new Date(input.startOfMonth),
+            lt: new Date(input.endOfMonth),
+          },
+        },
+        _sum: {
+          amount: true,
+        },
+        orderBy: {
+          _sum: {
+            amount: "desc",
+          },
+        },
+      });
+
+      return result.map((item) => ({
+        category: item.category,
+        amount: item._sum.amount,
+      }));
     }),
   getYearInReview: protectedProcedure.query(async ({ ctx }) => {
     // Get the start date of the previous year
