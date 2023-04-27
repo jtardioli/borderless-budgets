@@ -74,7 +74,8 @@ const MonthlyReport = () => {
           </button>
 
           <h1 className="text-xl">
-            {format(new Date(month as string), "MMMM yyyy ")} - Monthly Review
+            {typeof month === "string" && format(new Date(month), "MMMM yyyy ")}{" "}
+            - Monthly Review
           </h1>
           <div className="flex gap-10">
             <div className="flex h-[400px] flex-1 items-center justify-center  overflow-y-auto  rounded-md border-[1px] border-gray-300 bg-white py-4 drop-shadow-sm">
