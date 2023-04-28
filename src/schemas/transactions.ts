@@ -1,7 +1,7 @@
 import { type TypeOf, z } from "zod";
 import { CurrencyCode } from "~/config/currencyExchange";
 
-export enum TransactionCategory {
+export enum TransactionExpenseCategory {
   HOUSING = "Housing and Utilities",
   TRANSPORTATION = "Transportation",
   TRAVEL = "Travel",
@@ -17,6 +17,20 @@ export enum TransactionCategory {
   TAXES = "Taxes",
   MISC = "Misc",
 }
+export enum TransactionIncomeCategory {
+  SALARY = "Salary",
+  FREELANCE = "Freelance",
+  GIFTS = "Gifts",
+  MISC = "Misc",
+}
+
+export const TransactionCategoryObject = {
+  ...TransactionExpenseCategory,
+  ...TransactionIncomeCategory,
+};
+
+export type TransactionCategory =
+  (typeof TransactionCategoryObject)[keyof typeof TransactionCategoryObject];
 
 export enum TransactionType {
   EXPENSE = "Expense",
@@ -27,7 +41,10 @@ export const TransactionSchema = z.object({
   id: z.string(),
   amount: z.number(),
   description: z.string(),
-  category: z.nativeEnum(TransactionCategory),
+  category: z.union([
+    z.nativeEnum(TransactionExpenseCategory),
+    z.nativeEnum(TransactionIncomeCategory),
+  ]),
   createdAt: z.union([z.date(), z.string()]),
   date: z.union([z.date(), z.string()]),
   type: z.nativeEnum(TransactionType),

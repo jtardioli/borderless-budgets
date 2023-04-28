@@ -1,4 +1,9 @@
-import { type ChangeEvent, type FormEvent, useState } from "react";
+import {
+  type ChangeEvent,
+  type FormEvent,
+  useState,
+  type ReactNode,
+} from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
 
@@ -8,9 +13,12 @@ import { GiExpense, GiReceiveMoney } from "react-icons/gi";
 import { type NextPage } from "next";
 import { api } from "~/config/api";
 import {
-  TransactionCategory,
+  type TransactionCategory,
   type TransactionNew,
   TransactionType,
+  TransactionCategoryObject,
+  TransactionExpenseCategory,
+  TransactionIncomeCategory,
 } from "~/schemas/transactions";
 import { formatCurrency } from "~/utils/currency";
 import { useSession } from "next-auth/react";
@@ -22,14 +30,19 @@ import { getMonthStartAndEnd } from "~/utils/dates";
 import { format } from "date-fns";
 import Head from "next/head";
 
-const emptyTransaction = {
-  description: "",
-  category: TransactionCategory.HOUSING,
-  amount: 0,
-  date: new Date(),
-  type: TransactionType.EXPENSE,
-  currency: CurrencyCode.CAD,
-};
+function getEmptyTransaction(
+  type: TransactionType,
+  defaultCategory: TransactionCategory
+) {
+  return {
+    description: "",
+    category: defaultCategory,
+    amount: 0,
+    date: new Date(),
+    type,
+    currency: CurrencyCode.CAD,
+  };
+}
 
 const Home: NextPage = () => {
   const { data: session } = useSession({ required: true });
@@ -49,10 +62,24 @@ const Home: NextPage = () => {
       enabled: session?.user !== undefined,
     });
 
+  const [formType, setFormType] = useState<TransactionType>(
+    TransactionType.EXPENSE
+  );
+
   const createTx = api.transactions.create.useMutation({
     async onSuccess(input) {
       await utils.transactions.invalidate();
-      setFormData(emptyTransaction);
+      setFormData(
+        formType === TransactionType.EXPENSE
+          ? getEmptyTransaction(
+              TransactionType.EXPENSE,
+              TransactionExpenseCategory.HOUSING
+            )
+          : getEmptyTransaction(
+              TransactionType.INCOME,
+              TransactionIncomeCategory.SALARY
+            )
+      );
     },
   });
 
@@ -62,7 +89,12 @@ const Home: NextPage = () => {
     },
   });
 
-  const [formData, setFormData] = useState<TransactionNew>(emptyTransaction);
+  const [formData, setFormData] = useState<TransactionNew>(
+    getEmptyTransaction(
+      TransactionType.EXPENSE,
+      TransactionExpenseCategory.HOUSING
+    )
+  );
 
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target;
@@ -85,6 +117,13 @@ const Home: NextPage = () => {
       currency,
     });
   }
+
+  const formCategoryType:
+    | typeof TransactionExpenseCategory
+    | typeof TransactionIncomeCategory =
+    formType === TransactionType.EXPENSE
+      ? TransactionExpenseCategory
+      : TransactionIncomeCategory;
 
   function renderTransactions() {
     return transactions?.map((tx) => {
@@ -198,10 +237,40 @@ const Home: NextPage = () => {
             {/* Create Expense*/}
             <div className="mt-10 h-[450px]  flex-[1] flex-col overflow-hidden rounded-md border-[1px] border-gray-300 bg-white drop-shadow-sm">
               <div className=" flex h-12  border-b-[1px] border-gray-300">
-                <button className="flex-1 bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 shadow-md">
+                <button
+                  className={`flex-1 ${
+                    formType === TransactionType.EXPENSE
+                      ? "bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 shadow-md"
+                      : "bg-gray-100 text-gray-700 shadow-inner"
+                  } `}
+                  onClick={() => {
+                    setFormType(TransactionType.EXPENSE);
+                    setFormData(
+                      getEmptyTransaction(
+                        TransactionType.EXPENSE,
+                        TransactionExpenseCategory.HOUSING
+                      )
+                    );
+                  }}
+                >
                   Add Expense
                 </button>
-                <button className="flex-1 bg-gray-100 text-gray-700 shadow-inner">
+                <button
+                  className={`flex-1 ${
+                    formType === TransactionType.INCOME
+                      ? "bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 shadow-md"
+                      : "bg-gray-100 text-gray-700 shadow-inner"
+                  } `}
+                  onClick={() => {
+                    setFormType(TransactionType.INCOME);
+                    setFormData(
+                      getEmptyTransaction(
+                        TransactionType.INCOME,
+                        TransactionIncomeCategory.SALARY
+                      )
+                    );
+                  }}
+                >
                   Add Income
                 </button>
               </div>
@@ -241,11 +310,13 @@ const Home: NextPage = () => {
                     value={formData.category}
                     onChange={handleChange}
                   >
-                    {Object.values(TransactionCategory).map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
+                    {Object.values(formCategoryType).map(
+                      (category: keyof typeof formCategoryType) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      )
+                    )}
                   </select>
                 </div>
 

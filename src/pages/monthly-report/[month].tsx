@@ -3,7 +3,7 @@ import Layout from "~/components/Layout";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import { api } from "~/config/api";
-import { getSession, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { formatCurrency } from "~/utils/currency";
 import { getMonthStartAndEnd } from "~/utils/dates";
 import Head from "next/head";

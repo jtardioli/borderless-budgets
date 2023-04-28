@@ -34,8 +34,12 @@ const YearInReview: NextPage = () => {
                     key={date}
                     href={`/monthly-report/${String(new Date(date))}`}
                   >
-                    <div className="flex h-[100px]  w-[250px] flex-col items-start  justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 px-4 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
+                    <div className="flex h-[130px]  w-[250px] flex-col items-start  justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 px-4 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
                       <h4 className=" opacity-85 text-sm ">{date}</h4>
+                      <p>
+                        Balance:{" "}
+                        {formatCurrency(vals.income + vals.expenses, "USD")}
+                      </p>
                       <p>Expenses: {formatCurrency(vals.expenses, "USD")}</p>
                       <p>Income: {formatCurrency(vals.income, "USD")}</p>
                     </div>
