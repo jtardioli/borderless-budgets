@@ -56,10 +56,16 @@ const MonthlyReport = () => {
           "rgba(153, 102, 255, 1)",
           "rgba(255, 159, 64, 1)",
         ],
-
-        borderWidth: 1,
       },
     ],
+  };
+
+  const options = {
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
   };
 
   return (
@@ -78,19 +84,30 @@ const MonthlyReport = () => {
             - Monthly Review
           </h1>
           <div className="flex gap-10">
-            <div className="flex h-[400px] flex-1 items-center justify-center  overflow-y-auto  rounded-md border-[1px] border-gray-300 bg-white py-4 drop-shadow-sm">
-              <div className="h-[300px] w-[300px] ">
-                <Pie data={data} />
+            <div className="flex h-[360px] flex-1 items-center justify-center  overflow-y-auto  rounded-md border-[1px] border-gray-300 bg-white py-4 drop-shadow-sm">
+              <div className="flex">
+                <div className="h-[260px] w-[260px]">
+                  <Pie data={data} options={options} />
+                </div>
               </div>
             </div>
-            <div className="h-[400px] flex-1 flex-col  overflow-y-auto  rounded-md border-[1px] border-gray-300 bg-white px-6 py-4 drop-shadow-sm">
+            <div className="h-[360px] flex-1 flex-col  overflow-y-auto  rounded-md border-[1px] border-gray-300 bg-white px-6 py-4 drop-shadow-sm">
               <h3 className=" font-semibold">Monthly Expenses</h3>
 
               <div className="mt-4 flex flex-col gap-2">
-                {monthlyCategoryExpenditure?.map((c) => {
+                {monthlyCategoryExpenditure?.map((c, i) => {
                   return (
                     <div key={c.category} className="flex justify-between">
-                      <p>{c.category}</p>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="mt-1 flex h-3 w-3 rounded-full"
+                          style={{
+                            background: data.datasets[0]!.backgroundColor[i],
+                          }}
+                        ></div>
+                        <p>{c.category}</p>
+                      </div>
+
                       <div className="flex">
                         <p className="text-right">
                           {monthlyExpenditure &&

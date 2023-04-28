@@ -151,7 +151,11 @@ const Home: NextPage = () => {
               </p>
               <p className="text-sm text-gray-600">{tx.category}</p>
             </div>
-            <p className="flex-[1.3] ">-{formatCurrency(tx.amount, "USD")}</p>
+            <p className="flex-[1.3] ">
+              {`${
+                tx.type === TransactionType.EXPENSE ? "-" : ""
+              }${formatCurrency(tx.amount, "USD")}`}
+            </p>
             <p className="flex-1 ">
               {format(new Date(tx.date), "dd/MM/yyyy ")}
             </p>
