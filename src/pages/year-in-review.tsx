@@ -11,6 +11,9 @@ import { formatCurrency } from "~/utils/currency";
 const YearInReview: NextPage = () => {
   const { data, isFetching } = api.transactions.getYearInReview.useQuery();
 
+  const displayEmptyState =
+    !isFetching && data && Object.keys(data).length === 0;
+
   return (
     <>
       <Head>
@@ -47,6 +50,26 @@ const YearInReview: NextPage = () => {
                 );
               })}
           </div>
+
+          {displayEmptyState && (
+            <div className="mt-6 flex  w-full flex-col items-center gap-6  rounded-md border-[1px] border-gray-300 bg-white px-6 py-12 drop-shadow-sm">
+              <div className="flex flex-col text-center">
+                <p>
+                  Looks like there are no transactions for the selected year.
+                </p>
+                <p>
+                  Choose a different year or start adding new transactions to
+                  keep track of your finances.
+                </p>
+              </div>
+
+              <Link href="/">
+                <button className="flex h-10 w-56 items-center justify-center rounded-md bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 drop-shadow-md">
+                  Go to Dashboard
+                </button>
+              </Link>
+            </div>
+          )}
         </main>
       </Layout>
     </>

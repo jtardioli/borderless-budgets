@@ -102,6 +102,13 @@ const Home: NextPage = () => {
       enabled: session?.user !== undefined,
     });
 
+  const { data: monthlyIncome } = api.transactions.getMonthlyIncome.useQuery(
+    getMonthStartAndEnd(),
+    {
+      enabled: session?.user !== undefined,
+    }
+  );
+
   const [formType, setFormType] = useState<TransactionType>(
     TransactionType.EXPENSE
   );
@@ -207,8 +214,6 @@ const Home: NextPage = () => {
     });
   }
 
-  console.log(monthlyExpenditure, "gg");
-
   return (
     <>
       <Head>
@@ -242,6 +247,18 @@ const Home: NextPage = () => {
                 <Skeleton bg="bg-indigo-400" />
               )}
             </div>
+            <div className="flex h-[100px] w-[220px] flex-col items-center  justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
+              {monthlyIncome != null ? (
+                <>
+                  <p>Monthly Income</p>
+                  <p className="text-2xl">
+                    {formatCurrency(monthlyIncome, "USD")}
+                  </p>
+                </>
+              ) : (
+                <Skeleton bg="bg-indigo-400" />
+              )}
+            </div>
           </section>
 
           <section className=" flex flex-[1] gap-10">
@@ -261,6 +278,28 @@ const Home: NextPage = () => {
                       </div>
                     );
                   })}
+
+                {transactions && transactions.length === 0 && (
+                  <div className="mt-8 flex w-full flex-col justify-center  text-gray-700">
+                    <p className="text-center">
+                      Oops! No transactions to display yet.
+                    </p>
+                    <p className="text-center">
+                      Add an expense, income, or investment to begin tracking
+                      your finances.
+                    </p>
+                    {[...(Array(3) as number[])].map((_, i) => {
+                      return (
+                        <div
+                          key={i}
+                          className="mx-8 my-4 h-20 overflow-hidden rounded-md"
+                        >
+                          <Skeleton bg="bg-slate-200" />
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
 
                 {renderTransactions()}
               </div>

@@ -18,6 +18,8 @@ import { format } from "date-fns";
 import { BsChevronLeft } from "react-icons/bs";
 import { TransactionType } from "~/schemas/transactions";
 import MonthlyCategories from "~/components/MonthlyCategories";
+import { Grid } from "react-loading-icons";
+import Link from "next/link";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -26,7 +28,7 @@ const MonthlyReport = () => {
   const { month } = router.query;
   const { data: session } = useSession({ required: true });
 
-  const { data: monthlyExpenseCategories } =
+  const monthlyExpenseCategories =
     api.transactions.getMonthlyCategories.useQuery(
       {
         ...getMonthStartAndEnd(new Date(month as string)),
@@ -34,9 +36,10 @@ const MonthlyReport = () => {
       },
       {
         enabled: session?.user !== undefined && !!month,
+        refetchOnWindowFocus: false,
       }
     );
-  const { data: monthlyIncomeCategories } =
+  const monthlyIncomeCategories =
     api.transactions.getMonthlyCategories.useQuery(
       {
         ...getMonthStartAndEnd(new Date(month as string)),
@@ -44,38 +47,38 @@ const MonthlyReport = () => {
       },
       {
         enabled: session?.user !== undefined && !!month,
+        refetchOnWindowFocus: false,
       }
     );
 
-  const { data: monthlyExpenditure } =
-    api.transactions.getMonthlyExpenditure.useQuery(
-      getMonthStartAndEnd(new Date(month as string)),
-      {
-        enabled: session?.user !== undefined && !!month,
-      }
-    );
-  const { data: monthlyIncome } = api.transactions.getMonthlyIncome.useQuery(
+  const monthlyExpenditure = api.transactions.getMonthlyExpenditure.useQuery(
     getMonthStartAndEnd(new Date(month as string)),
     {
       enabled: session?.user !== undefined && !!month,
+      refetchOnWindowFocus: false,
+    }
+  );
+  const monthlyIncome = api.transactions.getMonthlyIncome.useQuery(
+    getMonthStartAndEnd(new Date(month as string)),
+    {
+      enabled: session?.user !== undefined && !!month,
+      refetchOnWindowFocus: false,
     }
   );
 
-  const expenseCategories = monthlyExpenseCategories?.map((c) => {
+  const expenseCategories = monthlyExpenseCategories.data?.map((c) => {
     return c.category;
   });
-  const expenseAmounts = monthlyExpenseCategories?.map((c) => {
+  const expenseAmounts = monthlyExpenseCategories.data?.map((c) => {
     return c.amount;
   });
 
-  const incomeCategories = monthlyIncomeCategories?.map((c) => {
+  const incomeCategories = monthlyIncomeCategories.data?.map((c) => {
     return c.category;
   });
-  const incomeAmounts = monthlyIncomeCategories?.map((c) => {
+  const incomeAmounts = monthlyIncomeCategories.data?.map((c) => {
     return c.amount;
   });
-
-  console.log(incomeAmounts);
 
   const expenseData: ChartData<"pie"> = {
     labels: expenseCategories,
@@ -129,6 +132,15 @@ const MonthlyReport = () => {
     },
   };
 
+  const isFetching =
+    monthlyExpenditure.isFetching ||
+    monthlyIncome.isFetching ||
+    monthlyExpenseCategories.isFetching ||
+    monthlyIncomeCategories.isFetching;
+
+  const displayEmptyState =
+    !isFetching && monthlyExpenditure.data === 0 && monthlyIncome.data === 0;
+
   return (
     <>
       <Head>
@@ -145,20 +157,53 @@ const MonthlyReport = () => {
             - Monthly Review
           </h1>
 
-          <MonthlyCategories
-            title={"Monthly Expenses"}
-            graphData={expenseData}
-            graphOptions={options}
-            monthlyCategories={monthlyExpenseCategories}
-            monthlyTotal={monthlyExpenditure}
-          />
-          <MonthlyCategories
-            title={"Monthly Income"}
-            graphData={incomeData}
-            graphOptions={options}
-            monthlyCategories={monthlyIncomeCategories}
-            monthlyTotal={monthlyIncome}
-          />
+          {isFetching && (
+            <div className="mt-32 flex justify-center">
+              <Grid fill="#4f46e5" width="50px" />
+            </div>
+          )}
+
+          {!isFetching &&
+            !!monthlyExpenditure.data &&
+            monthlyExpenditure.data !== 0 && (
+              <MonthlyCategories
+                title={"Monthly Expenses"}
+                graphData={expenseData}
+                graphOptions={options}
+                monthlyCategories={monthlyExpenseCategories.data}
+                monthlyTotal={monthlyExpenditure.data}
+              />
+            )}
+
+          {!isFetching && !!monthlyIncome.data && monthlyIncome.data !== 0 && (
+            <MonthlyCategories
+              title={"Monthly Income"}
+              graphData={incomeData}
+              graphOptions={options}
+              monthlyCategories={monthlyIncomeCategories.data}
+              monthlyTotal={monthlyIncome.data}
+            />
+          )}
+
+          {displayEmptyState && (
+            <div className="mt-6 flex  w-full flex-col items-center gap-6  rounded-md border-[1px] border-gray-300 bg-white px-6 py-12 drop-shadow-sm">
+              <div className="flex flex-col text-center">
+                <p>
+                  Looks like there are no transactions for the selected month.
+                </p>
+                <p>
+                  Choose a different month or start adding new transactions to
+                  keep track of your finances.
+                </p>
+              </div>
+
+              <Link href="/">
+                <button className="flex h-10 w-56 items-center justify-center rounded-md bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 drop-shadow-md">
+                  Go to Dashboard
+                </button>
+              </Link>
+            </div>
+          )}
         </main>
       </Layout>
     </>

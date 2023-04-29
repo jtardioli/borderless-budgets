@@ -40,6 +40,14 @@ This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3
 
 [x] Income
 
-[ ] Add investment tracker page
+[x] Add investments
 
-[ ] Add income to monthly review page
+[x] Add income to monthly review page
+
+[ ] Create empty state for tx
+
+[ ] Add investments to monthly review
+
+[x] Better loading for monthly review page
+
+[x] Add income to top bar on dashboard

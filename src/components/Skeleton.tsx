@@ -5,7 +5,9 @@ type Props = {
 };
 
 const Skeleton: FC<Props> = ({ bg }) => {
-  return <div className={`h-full w-full animate-pulse ${bg}`}></div>;
+  return (
+    <div className={`h-full w-full  animate-pulse duration-75 ${bg}`}></div>
+  );
 };
 
 export default Skeleton;
