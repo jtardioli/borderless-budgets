@@ -13,12 +13,11 @@ import { GiExpense, GiReceiveMoney } from "react-icons/gi";
 import { type NextPage } from "next";
 import { api } from "~/config/api";
 import {
-  type TransactionCategory,
   type TransactionNew,
   TransactionType,
-  TransactionCategoryObject,
   TransactionExpenseCategory,
   TransactionIncomeCategory,
+  TransactionInvestmentCategory,
 } from "~/schemas/transactions";
 import { formatCurrency } from "~/utils/currency";
 import { useSession } from "next-auth/react";
@@ -29,19 +28,60 @@ import Skeleton from "~/components/Skeleton";
 import { getMonthStartAndEnd } from "~/utils/dates";
 import { format } from "date-fns";
 import Head from "next/head";
+import { assertNever } from "~/utils/types";
 
-function getEmptyTransaction(
-  type: TransactionType,
-  defaultCategory: TransactionCategory
-) {
-  return {
-    description: "",
-    category: defaultCategory,
-    amount: 0,
-    date: new Date(),
-    type,
-    currency: CurrencyCode.CAD,
-  };
+import { AiOutlineStock } from "react-icons/ai";
+
+function getEmptyTransaction(type: TransactionType) {
+  if (type === TransactionType.EXPENSE) {
+    return {
+      description: "",
+      category: TransactionExpenseCategory.HOUSING,
+      amount: 0,
+      date: new Date(),
+      type,
+      currency: CurrencyCode.CAD,
+    };
+  }
+
+  if (type === TransactionType.INCOME) {
+    return {
+      description: "",
+      category: TransactionIncomeCategory.SALARY,
+      amount: 0,
+      date: new Date(),
+      type,
+      currency: CurrencyCode.CAD,
+    };
+  }
+
+  if (type === TransactionType.INVESTMENT) {
+    return {
+      description: "",
+      category: TransactionInvestmentCategory.TFSA,
+      amount: 0,
+      date: new Date(),
+      type,
+      currency: CurrencyCode.CAD,
+    };
+  }
+
+  // Throw an error if none of the cases match
+  return assertNever(type);
+}
+
+function getFormCategoryValues(formType: TransactionType): string[] {
+  switch (formType) {
+    case TransactionType.EXPENSE:
+      return Object.values(TransactionExpenseCategory);
+    case TransactionType.INCOME:
+      return Object.values(TransactionIncomeCategory);
+    case TransactionType.INVESTMENT:
+      return Object.values(TransactionInvestmentCategory);
+    default:
+      // Throw an error if none of the cases match
+      return assertNever(formType);
+  }
 }
 
 const Home: NextPage = () => {
@@ -69,17 +109,7 @@ const Home: NextPage = () => {
   const createTx = api.transactions.create.useMutation({
     async onSuccess(input) {
       await utils.transactions.invalidate();
-      setFormData(
-        formType === TransactionType.EXPENSE
-          ? getEmptyTransaction(
-              TransactionType.EXPENSE,
-              TransactionExpenseCategory.HOUSING
-            )
-          : getEmptyTransaction(
-              TransactionType.INCOME,
-              TransactionIncomeCategory.SALARY
-            )
-      );
+      setFormData(getEmptyTransaction(formType));
     },
   });
 
@@ -90,10 +120,7 @@ const Home: NextPage = () => {
   });
 
   const [formData, setFormData] = useState<TransactionNew>(
-    getEmptyTransaction(
-      TransactionType.EXPENSE,
-      TransactionExpenseCategory.HOUSING
-    )
+    getEmptyTransaction(TransactionType.EXPENSE)
   );
 
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
@@ -118,12 +145,7 @@ const Home: NextPage = () => {
     });
   }
 
-  const formCategoryType:
-    | typeof TransactionExpenseCategory
-    | typeof TransactionIncomeCategory =
-    formType === TransactionType.EXPENSE
-      ? TransactionExpenseCategory
-      : TransactionIncomeCategory;
+  const formCategoryType = getFormCategoryValues(formType);
 
   function renderTransactions() {
     return transactions?.map((tx) => {
@@ -135,12 +157,18 @@ const Home: NextPage = () => {
           <div className="flex w-full items-center justify-between border-b-[1px] border-slate-200 py-4 ">
             <div className="flex flex-1 items-center">
               {tx.type === TransactionType.EXPENSE && (
-                <GiExpense size={40} className="text-gray-900 text-red-800" />
+                <GiExpense size={40} className="text-gray-900 text-red-900" />
               )}
               {tx.type === TransactionType.INCOME && (
                 <GiReceiveMoney
                   size={40}
-                  className="text-gray-900 text-green-800"
+                  className="text-gray-900 text-green-900"
+                />
+              )}
+              {tx.type === TransactionType.INVESTMENT && (
+                <AiOutlineStock
+                  size={40}
+                  className="text-blue-900 text-gray-900"
                 />
               )}
             </div>
@@ -249,33 +277,38 @@ const Home: NextPage = () => {
                   } `}
                   onClick={() => {
                     setFormType(TransactionType.EXPENSE);
-                    setFormData(
-                      getEmptyTransaction(
-                        TransactionType.EXPENSE,
-                        TransactionExpenseCategory.HOUSING
-                      )
-                    );
+                    setFormData(getEmptyTransaction(TransactionType.EXPENSE));
                   }}
                 >
-                  Add Expense
+                  Expense
                 </button>
                 <button
                   className={`flex-1 ${
                     formType === TransactionType.INCOME
                       ? "bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 shadow-md"
-                      : "bg-gray-100 text-gray-700 shadow-inner"
+                      : "border-l-[1px] border-r-[1px] border-slate-300 bg-gray-100 text-gray-700 shadow-inner"
                   } `}
                   onClick={() => {
                     setFormType(TransactionType.INCOME);
+                    setFormData(getEmptyTransaction(TransactionType.INCOME));
+                  }}
+                >
+                  Income
+                </button>
+                <button
+                  className={`flex-1 ${
+                    formType === TransactionType.INVESTMENT
+                      ? "bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 shadow-md"
+                      : "bg-gray-100 text-gray-700 shadow-inner"
+                  } `}
+                  onClick={() => {
+                    setFormType(TransactionType.INVESTMENT);
                     setFormData(
-                      getEmptyTransaction(
-                        TransactionType.INCOME,
-                        TransactionIncomeCategory.SALARY
-                      )
+                      getEmptyTransaction(TransactionType.INVESTMENT)
                     );
                   }}
                 >
-                  Add Income
+                  Investment
                 </button>
               </div>
               <form
@@ -314,13 +347,11 @@ const Home: NextPage = () => {
                     value={formData.category}
                     onChange={handleChange}
                   >
-                    {Object.values(formCategoryType).map(
-                      (category: keyof typeof formCategoryType) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      )
-                    )}
+                    {Object.values(formCategoryType).map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -378,10 +409,19 @@ const Home: NextPage = () => {
                 </div>
 
                 <button
+                  title={
+                    formType === TransactionType.INVESTMENT
+                      ? "Adding investments do not affect your balance, they are simply a means of tracking your cost basis"
+                      : ""
+                  }
                   className="flex h-10 items-center justify-center rounded-md bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 shadow-inner"
                   disabled={createTx.isLoading}
                 >
-                  {createTx.isLoading ? <Oval width="28px" /> : "Add Expense "}
+                  {createTx.isLoading ? (
+                    <Oval width="28px" />
+                  ) : (
+                    `Add ${formType}`
+                  )}
                 </button>
               </form>
             </div>

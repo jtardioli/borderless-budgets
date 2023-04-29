@@ -23,10 +23,17 @@ export enum TransactionIncomeCategory {
   GIFTS = "Gifts",
   MISC = "Misc",
 }
+export enum TransactionInvestmentCategory {
+  TFSA = "TFSA",
+  RRSP = "RRSP",
+  CRYPTO = "Crypto",
+  STOCKS = "Stocks",
+}
 
 export const TransactionCategoryObject = {
   ...TransactionExpenseCategory,
   ...TransactionIncomeCategory,
+  ...TransactionInvestmentCategory,
 };
 
 export type TransactionCategory =
@@ -35,6 +42,7 @@ export type TransactionCategory =
 export enum TransactionType {
   EXPENSE = "Expense",
   INCOME = "Income",
+  INVESTMENT = "Investment",
 }
 
 export const TransactionSchema = z.object({
@@ -44,6 +52,7 @@ export const TransactionSchema = z.object({
   category: z.union([
     z.nativeEnum(TransactionExpenseCategory),
     z.nativeEnum(TransactionIncomeCategory),
+    z.nativeEnum(TransactionInvestmentCategory),
   ]),
   createdAt: z.union([z.date(), z.string()]),
   date: z.union([z.date(), z.string()]),
