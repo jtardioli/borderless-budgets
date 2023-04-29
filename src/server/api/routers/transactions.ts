@@ -64,11 +64,40 @@ export const transactionsRouter = createTRPCRouter({
 
       return result._sum.amount ? result._sum.amount * -1 : 0;
     }),
-  getMonthlyCategoryExpenditure: protectedProcedure
+  getMonthlyIncome: protectedProcedure
     .input(
       z.object({
         startOfMonth: z.union([z.date(), z.string()]),
         endOfMonth: z.union([z.date(), z.string()]),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const result = await ctx.prisma.transaction.aggregate({
+        where: {
+          userId: ctx.session.user.id,
+          type: TransactionType.INCOME,
+          date: {
+            gte: new Date(input.startOfMonth),
+            lt: new Date(input.endOfMonth),
+          },
+        },
+        _sum: {
+          amount: true,
+        },
+      });
+
+      return result._sum.amount || 0;
+    }),
+  getMonthlyCategories: protectedProcedure
+    .input(
+      z.object({
+        startOfMonth: z.union([z.date(), z.string()]),
+        endOfMonth: z.union([z.date(), z.string()]),
+        txType: z.enum([
+          TransactionType.EXPENSE,
+          TransactionType.INCOME,
+          TransactionType.INVESTMENT,
+        ]),
       })
     )
     .query(async ({ ctx, input }) => {
@@ -76,7 +105,7 @@ export const transactionsRouter = createTRPCRouter({
         by: ["category"],
         where: {
           userId: ctx.session.user.id,
-          type: TransactionType.EXPENSE,
+          type: input.txType,
           date: {
             gte: new Date(input.startOfMonth),
             lt: new Date(input.endOfMonth),

@@ -14,8 +14,9 @@ type Props = {
 const Layout: FC<Props> = ({ children }) => {
   const { data: session } = useSession();
   return (
-    <div className="flex h-screen w-screen ">
-      <div className="flex h-full w-72 flex-col items-center justify-start bg-slate-100 bg-gradient-to-br py-[5%] drop-shadow-md">
+    <div className="flex w-screen ">
+      <div className="w-72 "></div>
+      <div className="fixed flex  h-screen w-60 flex-col items-center justify-start bg-slate-100 bg-gradient-to-br py-[5%] drop-shadow-md">
         <div className="items-flex-start flex flex-col">
           {session && (
             <div className="flex items-center gap-2">

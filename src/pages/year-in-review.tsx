@@ -17,7 +17,7 @@ const YearInReview: NextPage = () => {
         <title>Year In Review - Borderless Budgets</title>
       </Head>
       <Layout>
-        <main className="flex h-full w-full flex-col gap-6 bg-slate-200 px-10 py-8">
+        <main className="flex min-h-screen w-full flex-col gap-6 bg-slate-200 px-10 py-8">
           <h1 className="text-xl">Year In Review</h1>
           {isFetching && (
             <div className="mt-32 flex justify-center">
