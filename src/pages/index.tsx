@@ -1,9 +1,4 @@
-import {
-  type ChangeEvent,
-  type FormEvent,
-  useState,
-  type ReactNode,
-} from "react";
+import { type ChangeEvent, type FormEvent, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
 
@@ -108,6 +103,10 @@ const Home: NextPage = () => {
       enabled: session?.user !== undefined,
     }
   );
+  const { data: monthlyInvestments } =
+    api.transactions.getMonthlyInvestments.useQuery(getMonthStartAndEnd(), {
+      enabled: session?.user !== undefined,
+    });
 
   const [formType, setFormType] = useState<TransactionType>(
     TransactionType.EXPENSE
@@ -220,9 +219,9 @@ const Home: NextPage = () => {
         <title>Dashboard - Borderless Budgets</title>
       </Head>
       <Layout>
-        <main className="flex h-screen w-full flex-col gap-6 bg-slate-200 px-10 py-5">
-          <section className="flex h-[200px] items-center gap-10 rounded-md border-[1px] border-gray-300 bg-white px-8">
-            <div className=" flex h-[100px] w-[220px] flex-col items-center justify-center  overflow-hidden overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
+        <main className="flex h-screen w-full flex-col gap-6 overflow-scroll bg-slate-200 px-10 py-5">
+          <section className="flex h-[24vh] min-h-[130px] items-center justify-between gap-10 rounded-md border-[1px] border-gray-300 bg-white px-8">
+            <div className=" flex h-[13vh] w-[220px] flex-col items-center justify-center  overflow-hidden overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
               {balance != null ? (
                 <>
                   <p>Total Balance</p>
@@ -235,7 +234,7 @@ const Home: NextPage = () => {
               )}
             </div>
 
-            <div className="flex h-[100px] w-[220px] flex-col items-center  justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
+            <div className="flex h-[13vh] w-[220px] flex-col items-center  justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
               {monthlyExpenditure != null ? (
                 <>
                   <p>Monthly Expenditure</p>
@@ -247,12 +246,24 @@ const Home: NextPage = () => {
                 <Skeleton bg="bg-indigo-400" />
               )}
             </div>
-            <div className="flex h-[100px] w-[220px] flex-col items-center  justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
+            <div className="flex h-[13vh] w-[220px] flex-col items-center  justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
               {monthlyIncome != null ? (
                 <>
                   <p>Monthly Income</p>
                   <p className="text-2xl">
                     {formatCurrency(monthlyIncome, "USD")}
+                  </p>
+                </>
+              ) : (
+                <Skeleton bg="bg-indigo-400" />
+              )}
+            </div>
+            <div className="flex h-[13vh] w-[220px] flex-col items-center  justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
+              {monthlyInvestments != null ? (
+                <>
+                  <p>Monthly Investments</p>
+                  <p className="text-2xl">
+                    {formatCurrency(monthlyInvestments, "USD")}
                   </p>
                 </>
               ) : (
@@ -266,7 +277,7 @@ const Home: NextPage = () => {
             <div className="flex-[2]">
               <h1 className="p-8 py-2 text-gray-700">Recent Transactions</h1>
 
-              <div className="h-[475px]  overflow-y-auto  rounded-md border-[1px] border-gray-300 bg-white py-4 drop-shadow-sm">
+              <div className="max-h-[60vh] min-h-[475px]  overflow-y-auto  rounded-md border-[1px] border-gray-300 bg-white py-4 drop-shadow-sm">
                 {!transactions &&
                   [...(Array(5) as number[])].map((_, i) => {
                     return (
