@@ -83,7 +83,7 @@ const Layout: FC<Props> = ({ children }) => {
         </div>
       </div>
       {children}
-      <div className="absolute bottom-0 flex h-16 w-full items-center justify-between border-t-[1px]  border-slate-300 bg-slate-100 bg-gradient-to-br px-8 drop-shadow-md sm:hidden">
+      <div className="fixed bottom-0 flex h-16 w-full items-center justify-between border-t-[1px]  border-slate-300 bg-slate-100 bg-gradient-to-br px-8 drop-shadow-md sm:hidden">
         <Link href="/">
           <div className="flex justify-center ">
             <AiFillHome size={30} className="text-indigo-600 lg:mr-4" />
