@@ -158,10 +158,10 @@ const Home: NextPage = () => {
       return (
         <div
           key={tx.id}
-          className="flex w-full items-center justify-between px-8 text-gray-700"
+          className="flex w-full items-center justify-between px-4  text-gray-700 md:px-8"
         >
           <div className="flex w-full items-center justify-between border-b-[1px] border-slate-200 py-4 ">
-            <div className="flex flex-1 items-center">
+            <div className="hidden flex-1 items-center sm:flex">
               {tx.type === TransactionType.EXPENSE && (
                 <GiExpense size={40} className="text-gray-900 text-red-900" />
               )}
@@ -179,21 +179,21 @@ const Home: NextPage = () => {
               )}
             </div>
 
-            <div className="flex flex-[2]  flex-col">
-              <p className="text-base font-medium capitalize">
+            <div className="flex flex-[1.5] flex-col sm:flex-1  md:flex-[2]">
+              <p className="text-sm font-medium capitalize sm:text-base">
                 {tx.description}
               </p>
-              <p className="text-sm text-gray-600">{tx.category}</p>
+              <p className="text-xs text-gray-600 sm:text-sm">{tx.category}</p>
             </div>
-            <p className="flex-[1.3] ">
+            <p className="flex-[1.3] text-sm sm:text-base ">
               {`${
                 tx.type === TransactionType.EXPENSE ? "-" : ""
               }${formatCurrency(tx.amount, "USD")}`}
             </p>
-            <p className="flex-1 ">
+            <p className="flex-1 text-sm sm:text-base">
               {format(new Date(tx.date), "dd/MM/yyyy ")}
             </p>
-            <div className="flex flex-[1] items-center justify-end">
+            <div className="flex flex-[0.6] items-center justify-end sm:flex-[1]">
               {deleteTx.isLoading && deleteTx?.variables?.id === tx.id ? (
                 <Oval stroke="#C53030" width="20px" />
               ) : (
@@ -219,13 +219,16 @@ const Home: NextPage = () => {
         <title>Dashboard - Borderless Budgets</title>
       </Head>
       <Layout>
-        <main className="flex h-screen w-full flex-col gap-6 overflow-scroll bg-slate-200 px-10 py-5">
-          <section className="flex h-[24vh] min-h-[130px] items-center justify-between gap-10 rounded-md border-[1px] border-gray-300 bg-white px-8">
-            <div className=" flex h-[13vh] w-[220px] flex-col items-center justify-center  overflow-hidden overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
+        <main className="flex h-screen w-full flex-col gap-6 overflow-scroll bg-slate-200 px-4 py-5 pb-20 sm:px-10 sm:pb-5">
+          <section className="grid grid-cols-2 items-center justify-between gap-4 rounded-md border-[1px] border-gray-300 bg-white p-4 md:grid-cols-4 lg:gap-10 lg:px-8">
+            <div className="flex h-[13vh] flex-col items-start justify-center overflow-hidden  rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 px-4 font-medium tracking-wider text-white text-opacity-90 shadow-inner ">
               {balance != null ? (
                 <>
-                  <p>Total Balance</p>
-                  <p className="text-ellipsis text-2xl">
+                  <p className="text-xs leading-[10px] sm:leading-[6px]">
+                    Total
+                  </p>
+                  <p className="text-xs ">Balance</p>
+                  <p className="text-ellipsis text-xl sm:text-2xl">
                     {formatCurrency(balance, "USD")}
                   </p>
                 </>
@@ -234,11 +237,14 @@ const Home: NextPage = () => {
               )}
             </div>
 
-            <div className="flex h-[13vh] w-[220px] flex-col items-center  justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
+            <div className="flex h-[13vh] flex-col items-start justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 px-4 font-medium tracking-wider text-white text-opacity-90 shadow-inner ">
               {monthlyExpenditure != null ? (
                 <>
-                  <p>Monthly Expenditure</p>
-                  <p className="text-2xl">
+                  <p className="text-xs leading-[10px] sm:leading-[6px]">
+                    Monthly
+                  </p>
+                  <p className="text-xs">Expenses</p>
+                  <p className="text-ellipsis text-xl sm:text-2xl">
                     {formatCurrency(monthlyExpenditure, "USD")}
                   </p>
                 </>
@@ -246,11 +252,14 @@ const Home: NextPage = () => {
                 <Skeleton bg="bg-indigo-400" />
               )}
             </div>
-            <div className="flex h-[13vh] w-[220px] flex-col items-center  justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
+            <div className="flex h-[13vh] flex-col items-start justify-center overflow-hidden   rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 px-4 font-medium tracking-wider text-white text-opacity-90 shadow-inner ">
               {monthlyIncome != null ? (
                 <>
-                  <p>Monthly Income</p>
-                  <p className="text-2xl">
+                  <p className="text-xs leading-[10px] sm:leading-[6px]">
+                    Monthly
+                  </p>
+                  <p className="text-xs">Income</p>
+                  <p className="text-ellipsis text-xl sm:text-2xl">
                     {formatCurrency(monthlyIncome, "USD")}
                   </p>
                 </>
@@ -258,11 +267,14 @@ const Home: NextPage = () => {
                 <Skeleton bg="bg-indigo-400" />
               )}
             </div>
-            <div className="flex h-[13vh] w-[220px] flex-col items-center  justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
+            <div className="flex h-[13vh] flex-col items-start justify-center overflow-hidden   rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 px-4 font-medium tracking-wider text-white text-opacity-90 shadow-inner ">
               {monthlyInvestments != null ? (
                 <>
-                  <p>Monthly Investments</p>
-                  <p className="text-2xl">
+                  <p className="text-xs leading-[10px] sm:leading-[6px]">
+                    Monthly
+                  </p>
+                  <p className="text-xs">Investments</p>
+                  <p className="text-ellipsis text-xl sm:text-2xl">
                     {formatCurrency(monthlyInvestments, "USD")}
                   </p>
                 </>
@@ -275,7 +287,9 @@ const Home: NextPage = () => {
           <section className=" flex flex-[1] gap-10">
             {/* Transactions */}
             <div className="flex-[2]">
-              <h1 className="p-8 py-2 text-gray-700">Recent Transactions</h1>
+              <h1 className="px-2 py-2 text-gray-700 sm:px-8">
+                Recent Transactions
+              </h1>
 
               <div className="max-h-[60vh] min-h-[475px]  overflow-y-auto  rounded-md border-[1px] border-gray-300 bg-white py-4 drop-shadow-sm">
                 {!transactions &&
@@ -317,7 +331,7 @@ const Home: NextPage = () => {
             </div>
 
             {/* Create Expense*/}
-            <div className="mt-10 h-[450px]  flex-[1] flex-col overflow-hidden rounded-md border-[1px] border-gray-300 bg-white drop-shadow-sm">
+            <div className="mt-10 hidden  h-[450px] flex-[1] flex-col overflow-hidden rounded-md border-[1px] border-gray-300 bg-white drop-shadow-sm lg:block">
               <div className=" flex h-12  border-b-[1px] border-gray-300">
                 <button
                   className={`flex-1 ${
@@ -358,7 +372,7 @@ const Home: NextPage = () => {
                     );
                   }}
                 >
-                  Investment
+                  Invest
                 </button>
               </div>
               <form

@@ -14,10 +14,10 @@ type Props = {
 const Layout: FC<Props> = ({ children }) => {
   const { data: session } = useSession();
   return (
-    <div className="flex w-screen ">
-      <div className="w-72 "></div>
-      <div className="fixed flex  h-screen w-60 flex-col items-center justify-start bg-slate-100 bg-gradient-to-br py-[5%] drop-shadow-md">
-        <div className="items-flex-start flex flex-col">
+    <div className="flex w-screen">
+      <div className="hidden w-20 sm:block lg:w-72 "></div>
+      <div className="fixed  hidden h-screen w-20  flex-col items-center justify-start bg-slate-100 bg-gradient-to-br py-[5vh] drop-shadow-md sm:flex lg:w-60">
+        <div className="flex flex-col">
           {session && (
             <div className="flex items-center gap-2">
               {session.user?.image && (
@@ -30,7 +30,7 @@ const Layout: FC<Props> = ({ children }) => {
                 />
               )}
 
-              <p className="text-lg">{session.user.name}</p>
+              <p className="hidden text-lg lg:block">{session.user.name}</p>
             </div>
           )}
           {!session && (
@@ -44,38 +44,71 @@ const Layout: FC<Props> = ({ children }) => {
             </button>
           )}
           <div className="my-4"></div>
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col items-center gap-6 lg:items-start">
             <Link href="/">
-              <div className="flex py-2">
-                <AiFillHome size={30} className="mr-4 text-indigo-600" />
-                <h2 className="mt-[2px] text-lg">Dashboard</h2>
+              <div className="flex justify-center ">
+                <AiFillHome size={30} className="text-indigo-600 lg:mr-4" />
+                <h2 className="mt-[2px] hidden text-lg lg:block">Dashboard</h2>
               </div>
             </Link>
             <Link href={`/monthly-report/${String(new Date())}`}>
-              <div className="flex py-2">
+              <div className="flex justify-center  py-2">
                 <BsFillPieChartFill
                   size={30}
-                  className="mr-4 text-indigo-600"
+                  className="text-indigo-600 lg:mr-4"
                 />
-                <h2 className="mt-[2px] text-lg">Monthly Report</h2>
+                <h2 className="mt-[2px] hidden text-lg lg:block">
+                  Monthly Report
+                </h2>
               </div>
             </Link>
             <Link href="/year-in-review">
-              <div className="flex py-2">
-                <MdCalendarMonth size={30} className="mr-4 text-indigo-600" />
-                <h2 className="mt-[2px] text-lg">Year In Review</h2>
+              <div className="flex justify-center  py-2">
+                <MdCalendarMonth
+                  size={30}
+                  className="text-indigo-600 lg:mr-4"
+                />
+                <h2 className="mt-[2px] hidden text-lg lg:block">
+                  Year In Review
+                </h2>
               </div>
             </Link>
             <Link href="/settings">
-              <div className="flex py-2">
-                <IoMdSettings size={30} className="mr-4 text-indigo-600" />
-                <h2 className="mt-[2px] text-lg">Settings</h2>
+              <div className="flex justify-center  py-2">
+                <IoMdSettings size={30} className="text-indigo-600 lg:mr-4" />
+                <h2 className="mt-[2px] hidden text-lg lg:block">Settings</h2>
               </div>
             </Link>
           </div>
         </div>
       </div>
       {children}
+      <div className="absolute bottom-0 flex h-16 w-full items-center justify-between border-t-[1px]  border-slate-300 bg-slate-100 bg-gradient-to-br px-8 drop-shadow-md sm:hidden">
+        <Link href="/">
+          <div className="flex justify-center ">
+            <AiFillHome size={30} className="text-indigo-600 lg:mr-4" />
+            <h2 className="mt-[2px] hidden text-lg lg:block">Dashboard</h2>
+          </div>
+        </Link>
+        <Link href={`/monthly-report/${String(new Date())}`}>
+          <div className="flex justify-center  py-2">
+            <BsFillPieChartFill size={30} className="text-indigo-600 lg:mr-4" />
+            <h2 className="mt-[2px] hidden text-lg lg:block">Monthly Report</h2>
+          </div>
+        </Link>
+        <Link href="/year-in-review">
+          <div className="flex justify-center  py-2">
+            <MdCalendarMonth size={30} className="text-indigo-600 lg:mr-4" />
+            <h2 className="mt-[2px] hidden text-lg lg:block">Year In Review</h2>
+          </div>
+        </Link>
+        <Link href="/settings">
+          <div className="flex justify-center  py-2">
+            <IoMdSettings size={30} className="text-indigo-600 lg:mr-4" />
+            <h2 className="mt-[2px] hidden text-lg lg:block">Settings</h2>
+          </div>
+        </Link>
+      </div>
     </div>
   );
 };
