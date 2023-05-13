@@ -6,6 +6,7 @@ import { AiFillHome } from "react-icons/ai";
 import { IoMdSettings } from "react-icons/io";
 import { MdCalendarMonth } from "react-icons/md";
 import { BsFillPieChartFill } from "react-icons/bs";
+import NavItem from "./NavItem";
 
 type Props = {
   children: ReactNode;
@@ -15,8 +16,8 @@ const Layout: FC<Props> = ({ children }) => {
   const { data: session } = useSession();
   return (
     <div className="flex w-screen">
-      <div className="hidden w-20 sm:block lg:w-72 "></div>
-      <div className="fixed  hidden h-screen w-20  flex-col items-center justify-start bg-slate-100 bg-gradient-to-br py-[5vh] drop-shadow-md sm:flex lg:w-60">
+      <div className="hidden w-20  sm:block lg:min-w-[230px]"></div>
+      <div className="fixed  hidden h-screen w-20  flex-col items-center justify-start bg-slate-100 bg-gradient-to-br py-[5vh] drop-shadow-md sm:flex lg:min-w-[230px]">
         <div className="flex flex-col">
           {session && (
             <div className="flex items-center gap-2">
@@ -84,12 +85,10 @@ const Layout: FC<Props> = ({ children }) => {
       </div>
       {children}
       <div className="fixed bottom-0 flex h-16 w-full items-center justify-between border-t-[1px]  border-slate-300 bg-slate-100 bg-gradient-to-br px-8 drop-shadow-md sm:hidden">
-        <Link href="/">
-          <div className="flex justify-center ">
-            <AiFillHome size={30} className="text-indigo-600 lg:mr-4" />
-            <h2 className="mt-[2px] hidden text-lg lg:block">Dashboard</h2>
-          </div>
-        </Link>
+        <NavItem>
+          <AiFillHome size={30} className="text-indigo-600 lg:mr-4" />
+        </NavItem>
+
         <Link href={`/monthly-report/${String(new Date())}`}>
           <div className="flex justify-center  py-2">
             <BsFillPieChartFill size={30} className="text-indigo-600 lg:mr-4" />
