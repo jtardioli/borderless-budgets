@@ -24,15 +24,15 @@ const MonthlyCategories: FC<Props> = ({
   graphOptions,
 }) => {
   return (
-    <div className="flex  rounded-md border-[1px] border-gray-300 bg-white px-6 py-6 drop-shadow-sm">
+    <div className="flex flex-col rounded-md  border-[1px] border-gray-300 bg-white px-2 py-4 drop-shadow-sm sm:px-6 sm:py-6 md:flex-row">
       <div className="flex flex-1 items-center justify-center  overflow-y-auto">
         <div className="flex">
-          <div className="h-[230px] w-[230px]">
+          <div className="mb-4 h-[230px] w-[230px]">
             <Pie data={graphData} options={graphOptions} />
           </div>
         </div>
       </div>
-      <div className="min-h-[250px] flex-1 flex-col  overflow-y-auto  rounded-md border-[1px] border-gray-300 bg-slate-50 px-6 py-4 drop-shadow-sm">
+      <div className=" min-h-[100px] flex-1 flex-col overflow-y-auto  rounded-md  border-[1px] border-gray-300 bg-slate-50 px-6 py-4 drop-shadow-sm sm:min-h-[250px]">
         <div className="flex items-center justify-between">
           <h3 className=" font-semibold">{title}</h3>
           <h3 className=" font-semibold">
@@ -40,7 +40,7 @@ const MonthlyCategories: FC<Props> = ({
           </h3>
         </div>
 
-        <div className="mt-4 flex flex-col gap-2">
+        <div className="mt-4 flex flex-col gap-2 text-xs sm:text-base">
           {monthlyCategories?.map((c, i) => {
             return (
               <div key={c.category} className="flex justify-between">
@@ -57,14 +57,12 @@ const MonthlyCategories: FC<Props> = ({
                 </div>
 
                 <div className="flex">
-                  <p className="text-right">
+                  <p className="min-w-[80px] text-right  md:min-w-[120px]">
+                    {formatCurrency(c.amount!, "USD")} (
                     {monthlyTotal &&
                       c.amount &&
                       ((c.amount / monthlyTotal) * -100).toFixed(2)}
-                    %
-                  </p>
-                  <p className=" min-w-[120px]  text-right">
-                    {formatCurrency(c.amount!, "USD")}
+                    %)
                   </p>
                 </div>
               </div>

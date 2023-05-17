@@ -147,7 +147,7 @@ const MonthlyReport = () => {
         <title> Monthly Report - Borderless Budgets</title>
       </Head>
       <Layout>
-        <main className="flex h-full min-h-screen w-full flex-col gap-6 bg-slate-200 px-20 py-5">
+        <main className="flex h-full min-h-screen w-full flex-col gap-6 bg-slate-200 px-2 py-5 sm:px-4 lg:px-20">
           <button onClick={() => router.back()}>
             <BsChevronLeft size={25} />
           </button>
