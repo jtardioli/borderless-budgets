@@ -128,7 +128,7 @@ const Home: NextPage = () => {
         <title>Dashboard - Borderless Budgets</title>
       </Head>
       <Layout>
-        <main className="flex min-h-screen w-full flex-col gap-6 bg-slate-200 px-2 py-10 sm:px-6 lg:px-14">
+        <main className="flex min-h-screen w-full flex-col gap-6 bg-slate-200 px-2 py-10 pb-20 sm:px-6 lg:px-14">
           <section className="grid grid-cols-2 items-center justify-between gap-4 rounded-md border-[1px] border-gray-300 bg-white p-4 md:grid-cols-4 lg:gap-10 lg:px-8">
             <div className="flex h-[10vh] flex-col items-start justify-center overflow-hidden  rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 px-4 font-medium tracking-wider text-white text-opacity-90 shadow-inner ">
               {balance != null ? (
@@ -200,7 +200,7 @@ const Home: NextPage = () => {
                 Recent Transactions
               </h1>
 
-              <div className="max-h-[60vh] min-h-[475px]  overflow-y-auto  rounded-md border-[1px] border-gray-300 bg-white py-4 drop-shadow-sm">
+              <div className="max-h-[50vh] min-h-[475px] overflow-y-auto  rounded-md  border-[1px] border-gray-300 bg-white py-4 drop-shadow-sm sm:max-h-[60vh]">
                 {!transactions &&
                   [...(Array(5) as number[])].map((_, i) => {
                     return (

@@ -147,7 +147,7 @@ const MonthlyReport = () => {
         <title> Monthly Report - Borderless Budgets</title>
       </Head>
       <Layout>
-        <main className="flex h-full min-h-screen w-full flex-col gap-6 bg-slate-200 px-2 py-5 sm:px-4 lg:px-20">
+        <main className="flex h-full min-h-screen w-full flex-col gap-6 bg-slate-200 px-2 py-5 sm:px-4 lg:px-20 ">
           <button onClick={() => router.back()}>
             <BsChevronLeft size={25} />
           </button>
@@ -162,48 +162,51 @@ const MonthlyReport = () => {
               <Grid fill="#4f46e5" width="50px" />
             </div>
           )}
+          <div className="max-w-[1000px]">
+            {!isFetching &&
+              !!monthlyExpenditure.data &&
+              monthlyExpenditure.data !== 0 && (
+                <MonthlyCategories
+                  title={"Monthly Expenses"}
+                  graphData={expenseData}
+                  graphOptions={options}
+                  monthlyCategories={monthlyExpenseCategories.data}
+                  monthlyTotal={monthlyExpenditure.data}
+                />
+              )}
 
-          {!isFetching &&
-            !!monthlyExpenditure.data &&
-            monthlyExpenditure.data !== 0 && (
-              <MonthlyCategories
-                title={"Monthly Expenses"}
-                graphData={expenseData}
-                graphOptions={options}
-                monthlyCategories={monthlyExpenseCategories.data}
-                monthlyTotal={monthlyExpenditure.data}
-              />
-            )}
+            {!isFetching &&
+              !!monthlyIncome.data &&
+              monthlyIncome.data !== 0 && (
+                <MonthlyCategories
+                  title={"Monthly Income"}
+                  graphData={incomeData}
+                  graphOptions={options}
+                  monthlyCategories={monthlyIncomeCategories.data}
+                  monthlyTotal={monthlyIncome.data}
+                />
+              )}
 
-          {!isFetching && !!monthlyIncome.data && monthlyIncome.data !== 0 && (
-            <MonthlyCategories
-              title={"Monthly Income"}
-              graphData={incomeData}
-              graphOptions={options}
-              monthlyCategories={monthlyIncomeCategories.data}
-              monthlyTotal={monthlyIncome.data}
-            />
-          )}
+            {displayEmptyState && (
+              <div className="mt-6 flex  w-full flex-col items-center gap-6  rounded-md border-[1px] border-gray-300 bg-white px-6 py-12 drop-shadow-sm">
+                <div className="flex flex-col text-center">
+                  <p>
+                    Looks like there are no transactions for the selected month.
+                  </p>
+                  <p>
+                    Choose a different month or start adding new transactions to
+                    keep track of your finances.
+                  </p>
+                </div>
 
-          {displayEmptyState && (
-            <div className="mt-6 flex  w-full flex-col items-center gap-6  rounded-md border-[1px] border-gray-300 bg-white px-6 py-12 drop-shadow-sm">
-              <div className="flex flex-col text-center">
-                <p>
-                  Looks like there are no transactions for the selected month.
-                </p>
-                <p>
-                  Choose a different month or start adding new transactions to
-                  keep track of your finances.
-                </p>
+                <Link href="/">
+                  <button className="flex h-10 w-56 items-center justify-center rounded-md bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 drop-shadow-md">
+                    Go to Dashboard
+                  </button>
+                </Link>
               </div>
-
-              <Link href="/">
-                <button className="flex h-10 w-56 items-center justify-center rounded-md bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 drop-shadow-md">
-                  Go to Dashboard
-                </button>
-              </Link>
-            </div>
-          )}
+            )}
+          </div>
         </main>
       </Layout>
     </>

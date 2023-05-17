@@ -24,7 +24,7 @@ const MonthlyCategories: FC<Props> = ({
   graphOptions,
 }) => {
   return (
-    <div className="flex flex-col rounded-md  border-[1px] border-gray-300 bg-white px-2 py-4 drop-shadow-sm sm:px-6 sm:py-6 md:flex-row">
+    <div className="flex  flex-col  rounded-md border-[1px] border-gray-300 bg-white px-2 py-4 drop-shadow-sm sm:px-6 sm:py-6 md:flex-row">
       <div className="flex flex-1 items-center justify-center  overflow-y-auto">
         <div className="flex">
           <div className="mb-4 h-[230px] w-[230px]">
