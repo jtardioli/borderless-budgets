@@ -62,66 +62,6 @@ const Home: NextPage = () => {
 
   const modalRef = useRef<HTMLDialogElement>(null);
 
-  function renderTransactions() {
-    return transactions?.map((tx) => {
-      return (
-        <div
-          key={tx.id}
-          className="flex w-full items-center justify-between px-4  text-gray-700 md:px-8"
-        >
-          <div className="flex w-full items-center justify-between border-b-[1px] border-slate-200 py-4 ">
-            <div className="hidden flex-1 items-center sm:flex">
-              {tx.type === TransactionType.EXPENSE && (
-                <GiExpense size={40} className="text-gray-900 text-red-900" />
-              )}
-              {tx.type === TransactionType.INCOME && (
-                <GiReceiveMoney
-                  size={40}
-                  className="text-gray-900 text-green-900"
-                />
-              )}
-              {tx.type === TransactionType.INVESTMENT && (
-                <AiOutlineStock
-                  size={40}
-                  className="text-blue-900 text-gray-900"
-                />
-              )}
-            </div>
-
-            <div className="flex flex-[1.5] flex-col sm:flex-1  md:flex-[2]">
-              <p className="text-sm font-medium capitalize sm:text-base">
-                {tx.description}
-              </p>
-              <p className="text-xs text-gray-600 sm:text-sm">{tx.category}</p>
-            </div>
-            <p className="flex-[1.3] text-sm sm:text-base ">
-              {`${
-                tx.type === TransactionType.EXPENSE ? "-" : ""
-              }${formatCurrency(tx.amount, "USD")}`}
-            </p>
-            <p className="flex-1 text-sm sm:text-base">
-              {format(new Date(tx.date), "dd/MM/yyyy ")}
-            </p>
-            <div className="flex flex-[0.6] items-center justify-end sm:flex-[1]">
-              {deleteTx.isLoading && deleteTx?.variables?.id === tx.id ? (
-                <Oval stroke="#C53030" width="20px" />
-              ) : (
-                <RiDeleteBinFill
-                  className="text-gray-900 hover:text-red-800"
-                  onClick={() => {
-                    deleteTx.mutate({ id: tx.id });
-                  }}
-                  style={{ cursor: "pointer" }}
-                  size={23}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      );
-    });
-  }
-
   return (
     <>
       <Head>
@@ -130,9 +70,9 @@ const Home: NextPage = () => {
       <Layout>
         <main className="flex min-h-screen w-full flex-col gap-6 bg-slate-200 px-2 py-10 pb-20 sm:px-6 lg:px-14">
           <section className="grid grid-cols-2 items-center justify-between gap-4 rounded-md border-[1px] border-gray-300 bg-white p-4 md:grid-cols-4 lg:gap-10 lg:px-8">
-            <div className="flex h-[10vh] flex-col items-start justify-center overflow-hidden  rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 px-4 font-medium tracking-wider text-white text-opacity-90 shadow-inner ">
+            <div className="flex h-[10vh] flex-col items-start justify-center overflow-hidden  rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500  font-medium tracking-wider text-white text-opacity-90 shadow-inner ">
               {balance != null ? (
-                <>
+                <div className="px-4">
                   <p className="text-xs leading-[10px] sm:leading-[6px]">
                     Total
                   </p>
@@ -140,15 +80,15 @@ const Home: NextPage = () => {
                   <p className="text-ellipsis text-xl sm:text-2xl">
                     {formatCurrency(balance, "USD")}
                   </p>
-                </>
+                </div>
               ) : (
                 <Skeleton bg="bg-indigo-400" />
               )}
             </div>
 
-            <div className="flex h-[10vh] flex-col items-start justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 px-4 font-medium tracking-wider text-white text-opacity-90 shadow-inner ">
+            <div className="flex h-[10vh] flex-col items-start justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500  font-medium tracking-wider text-white text-opacity-90 shadow-inner ">
               {monthlyExpenditure != null ? (
-                <>
+                <div className="px-4">
                   <p className="text-xs leading-[10px] sm:leading-[6px]">
                     Monthly
                   </p>
@@ -156,14 +96,14 @@ const Home: NextPage = () => {
                   <p className="text-ellipsis text-xl sm:text-2xl">
                     {formatCurrency(monthlyExpenditure, "USD")}
                   </p>
-                </>
+                </div>
               ) : (
                 <Skeleton bg="bg-indigo-400" />
               )}
             </div>
-            <div className="flex h-[10vh] flex-col items-start justify-center overflow-hidden   rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 px-4 font-medium tracking-wider text-white text-opacity-90 shadow-inner ">
+            <div className="flex h-[10vh] flex-col items-start justify-center overflow-hidden   rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500  font-medium tracking-wider text-white text-opacity-90 shadow-inner ">
               {monthlyIncome != null ? (
-                <>
+                <div className="px-4">
                   <p className="text-xs leading-[10px] sm:leading-[6px]">
                     Monthly
                   </p>
@@ -171,14 +111,14 @@ const Home: NextPage = () => {
                   <p className="text-ellipsis text-xl sm:text-2xl">
                     {formatCurrency(monthlyIncome, "USD")}
                   </p>
-                </>
+                </div>
               ) : (
                 <Skeleton bg="bg-indigo-400" />
               )}
             </div>
-            <div className="flex h-[10vh] flex-col items-start justify-center overflow-hidden   rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 px-4 font-medium tracking-wider text-white text-opacity-90 shadow-inner ">
+            <div className="flex h-[10vh] flex-col items-start justify-center overflow-hidden   rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500  font-medium tracking-wider text-white text-opacity-90 shadow-inner ">
               {monthlyInvestments != null ? (
-                <>
+                <div className="px-4">
                   <p className="text-xs leading-[10px] sm:leading-[6px]">
                     Monthly
                   </p>
@@ -186,7 +126,7 @@ const Home: NextPage = () => {
                   <p className="text-ellipsis text-xl sm:text-2xl">
                     {formatCurrency(monthlyInvestments, "USD")}
                   </p>
-                </>
+                </div>
               ) : (
                 <Skeleton bg="bg-indigo-400" />
               )}
@@ -235,7 +175,69 @@ const Home: NextPage = () => {
                   </div>
                 )}
 
-                {renderTransactions()}
+                {transactions?.map((tx) => {
+                  return (
+                    <div
+                      key={tx.id}
+                      className="flex w-full items-center justify-between px-4  text-gray-700 md:px-8"
+                    >
+                      <div className="flex w-full items-center justify-between border-b-[1px] border-slate-200 py-4 ">
+                        <div className="hidden flex-1 items-center sm:flex">
+                          {tx.type === TransactionType.EXPENSE && (
+                            <GiExpense
+                              size={40}
+                              className="text-gray-900 text-red-900"
+                            />
+                          )}
+                          {tx.type === TransactionType.INCOME && (
+                            <GiReceiveMoney
+                              size={40}
+                              className="text-gray-900 text-green-900"
+                            />
+                          )}
+                          {tx.type === TransactionType.INVESTMENT && (
+                            <AiOutlineStock
+                              size={40}
+                              className="text-blue-900 text-gray-900"
+                            />
+                          )}
+                        </div>
+
+                        <div className="flex flex-[1.5] flex-col sm:flex-1  md:flex-[2]">
+                          <p className="text-sm font-medium capitalize sm:text-base">
+                            {tx.description}
+                          </p>
+                          <p className="text-xs text-gray-600 sm:text-sm">
+                            {tx.category}
+                          </p>
+                        </div>
+                        <p className="flex-[1.3] text-sm sm:text-base ">
+                          {`${
+                            tx.type === TransactionType.EXPENSE ? "-" : ""
+                          }${formatCurrency(tx.amount, "USD")}`}
+                        </p>
+                        <p className="flex-1 text-sm sm:text-base">
+                          {format(new Date(tx.date), "dd/MM/yyyy ")}
+                        </p>
+                        <div className="flex flex-[0.6] items-center justify-end sm:flex-[1]">
+                          {deleteTx.isLoading &&
+                          deleteTx?.variables?.id === tx.id ? (
+                            <Oval stroke="#C53030" width="20px" />
+                          ) : (
+                            <RiDeleteBinFill
+                              className="text-gray-900 hover:text-red-800"
+                              onClick={() => {
+                                deleteTx.mutate({ id: tx.id });
+                              }}
+                              style={{ cursor: "pointer" }}
+                              size={23}
+                            />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
