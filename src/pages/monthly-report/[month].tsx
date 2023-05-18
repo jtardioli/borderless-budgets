@@ -141,14 +141,29 @@ const MonthlyReport = () => {
   const displayEmptyState =
     !isFetching && monthlyExpenditure.data === 0 && monthlyIncome.data === 0;
 
+  const displayExpenses =
+    !isFetching && !!monthlyExpenditure.data && monthlyExpenditure.data !== 0;
+
+  const displayIncome =
+    !isFetching && !!monthlyIncome.data && monthlyIncome.data !== 0;
+
   return (
     <>
       <Head>
         <title> Monthly Report - Borderless Budgets</title>
       </Head>
       <Layout>
-        <main className="flex h-full min-h-screen w-full flex-col gap-6 bg-slate-200 px-2 py-5 sm:px-4 lg:px-20 ">
-          <button onClick={() => router.back()}>
+        <main className="flex h-full min-h-screen w-full flex-col gap-6 bg-slate-200 px-2 pb-20 pt-14 sm:px-4 sm:py-5 sm:pb-5 lg:px-20">
+          {/* Mobile Back Btn */}
+          <button
+            className="fixed  left-0 top-0 z-10 block h-12 w-full border-b-[1px] border-slate-300 bg-slate-100  bg-gradient-to-br drop-shadow-sm sm:hidden"
+            onClick={() => router.back()}
+          >
+            <BsChevronLeft size={25} />
+          </button>
+
+          {/* Normal Back Btn */}
+          <button className="hidden sm:block" onClick={() => router.back()}>
             <BsChevronLeft size={25} />
           </button>
 
@@ -162,30 +177,26 @@ const MonthlyReport = () => {
               <Grid fill="#4f46e5" width="50px" />
             </div>
           )}
-          <div className="max-w-[1000px]">
-            {!isFetching &&
-              !!monthlyExpenditure.data &&
-              monthlyExpenditure.data !== 0 && (
-                <MonthlyCategories
-                  title={"Monthly Expenses"}
-                  graphData={expenseData}
-                  graphOptions={options}
-                  monthlyCategories={monthlyExpenseCategories.data}
-                  monthlyTotal={monthlyExpenditure.data}
-                />
-              )}
+          <div className="flex max-w-[1000px] flex-col gap-6">
+            {displayExpenses && (
+              <MonthlyCategories
+                title={"Monthly Expenses"}
+                graphData={expenseData}
+                graphOptions={options}
+                monthlyCategories={monthlyExpenseCategories.data}
+                monthlyTotal={monthlyExpenditure.data}
+              />
+            )}
 
-            {!isFetching &&
-              !!monthlyIncome.data &&
-              monthlyIncome.data !== 0 && (
-                <MonthlyCategories
-                  title={"Monthly Income"}
-                  graphData={incomeData}
-                  graphOptions={options}
-                  monthlyCategories={monthlyIncomeCategories.data}
-                  monthlyTotal={monthlyIncome.data}
-                />
-              )}
+            {displayIncome && (
+              <MonthlyCategories
+                title={"Monthly Income"}
+                graphData={incomeData}
+                graphOptions={options}
+                monthlyCategories={monthlyIncomeCategories.data}
+                monthlyTotal={monthlyIncome.data}
+              />
+            )}
 
             {displayEmptyState && (
               <div className="mt-6 flex  w-full flex-col items-center gap-6  rounded-md border-[1px] border-gray-300 bg-white px-6 py-12 drop-shadow-sm">

@@ -200,7 +200,7 @@ const Home: NextPage = () => {
                 Recent Transactions
               </h1>
 
-              <div className="max-h-[50vh] min-h-[475px] overflow-y-auto  rounded-md  border-[1px] border-gray-300 bg-white py-4 drop-shadow-sm sm:max-h-[60vh]">
+              <div className="max-h-[50vh] min-h-[50vh] overflow-y-auto rounded-md border-[1px]  border-gray-300  bg-white py-4 drop-shadow-sm md:max-h-[62vh] md:min-h-[62vh]">
                 {!transactions &&
                   [...(Array(5) as number[])].map((_, i) => {
                     return (
@@ -254,7 +254,7 @@ const Home: NextPage = () => {
           <AiOutlinePlus size={27} />
         </button>
         <dialog
-          className=" rounded-lg bg-slate-100 drop-shadow-xl backdrop:bg-[rgba(0,0,0,0.3)]"
+          className=" rounded-lg bg-slate-100 drop-shadow-xl backdrop:bg-[rgba(0,0,0,0.59)]"
           ref={modalRef}
         >
           <div className="flex w-full items-center justify-end">
