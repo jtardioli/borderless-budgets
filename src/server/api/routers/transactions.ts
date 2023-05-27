@@ -40,21 +40,26 @@ export const transactionsRouter = createTRPCRouter({
     // Return the user's balance
     return user.balance;
   }),
-  getMonthlyExpenditure: protectedProcedure
+  getTotalByTransactionType: protectedProcedure
     .input(
       z.object({
-        startOfMonth: z.union([z.date(), z.string()]),
-        endOfMonth: z.union([z.date(), z.string()]),
+        startDate: z.union([z.date(), z.string()]),
+        endDate: z.union([z.date(), z.string()]),
+        txType: z.enum([
+          TransactionType.EXPENSE,
+          TransactionType.INCOME,
+          TransactionType.INVESTMENT,
+        ]),
       })
     )
     .query(async ({ input, ctx }) => {
       const result = await ctx.prisma.transaction.aggregate({
         where: {
           userId: ctx.session.user.id,
-          type: TransactionType.EXPENSE,
+          type: input.txType,
           date: {
-            gte: new Date(input.startOfMonth),
-            lt: new Date(input.endOfMonth),
+            gte: new Date(input.startDate),
+            lt: new Date(input.endDate),
           },
         },
         _sum: {
@@ -62,7 +67,15 @@ export const transactionsRouter = createTRPCRouter({
         },
       });
 
-      return result._sum.amount ? result._sum.amount * -1 : 0;
+      if (input.txType === TransactionType.EXPENSE) {
+        return result._sum.amount ? result._sum.amount * -1 : 0;
+      } else if (input.txType === TransactionType.INCOME) {
+        return result._sum.amount || 0;
+      } else if (input.txType === TransactionType.INVESTMENT) {
+        return result._sum.amount || 0;
+      } else {
+        throw new Error("Invalid transaction type provided");
+      }
     }),
   getMonthlyIncome: protectedProcedure
     .input(

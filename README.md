@@ -24,30 +24,4 @@ This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3
 
 ## Todo
 
-[x] switch routes to protected
-
-[x] year in review
-
-[x] add balance to user table
-
-[x] add monthly balance monthly income
-
-[x] add other currencies
-
-[x] add monthly review for any month
-
-[x] expense category chart
-
-[x] Income
-
-[x] Add investments
-
-[x] Add income to monthly review page
-
-[ ] Create empty state for tx
-
-[ ] Add investments to monthly review
-
-[x] Better loading for monthly review page
-
-[x] Add income to top bar on dashboard
+[x] Add investments to monthly review

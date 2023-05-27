@@ -50,21 +50,59 @@ const MonthlyReport = () => {
         refetchOnWindowFocus: false,
       }
     );
+  const monthlyInvestmentCategories =
+    api.transactions.getMonthlyCategories.useQuery(
+      {
+        ...getMonthStartAndEnd(new Date(month as string)),
+        txType: TransactionType.INVESTMENT,
+      },
+      {
+        enabled: session?.user !== undefined && !!month,
+        refetchOnWindowFocus: false,
+      }
+    );
 
-  const monthlyExpenditure = api.transactions.getMonthlyExpenditure.useQuery(
-    getMonthStartAndEnd(new Date(month as string)),
+  const { startOfMonth, endOfMonth } = getMonthStartAndEnd(
+    new Date(month as string)
+  );
+
+  const monthlyExpenditure =
+    api.transactions.getTotalByTransactionType.useQuery(
+      {
+        startDate: startOfMonth,
+        endDate: endOfMonth,
+        txType: TransactionType.EXPENSE,
+      },
+      {
+        enabled: session?.user !== undefined && !!month,
+        refetchOnWindowFocus: false,
+      }
+    );
+
+  const monthlyIncome = api.transactions.getTotalByTransactionType.useQuery(
+    {
+      startDate: startOfMonth,
+      endDate: endOfMonth,
+      txType: TransactionType.INCOME,
+    },
     {
       enabled: session?.user !== undefined && !!month,
       refetchOnWindowFocus: false,
     }
   );
-  const monthlyIncome = api.transactions.getMonthlyIncome.useQuery(
-    getMonthStartAndEnd(new Date(month as string)),
-    {
-      enabled: session?.user !== undefined && !!month,
-      refetchOnWindowFocus: false,
-    }
-  );
+
+  const monthlyInvestments =
+    api.transactions.getTotalByTransactionType.useQuery(
+      {
+        startDate: startOfMonth,
+        endDate: endOfMonth,
+        txType: TransactionType.INVESTMENT,
+      },
+      {
+        enabled: session?.user !== undefined && !!month,
+        refetchOnWindowFocus: false,
+      }
+    );
 
   const expenseCategories = monthlyExpenseCategories.data?.map((c) => {
     return c.category;
@@ -79,12 +117,18 @@ const MonthlyReport = () => {
   const incomeAmounts = monthlyIncomeCategories.data?.map((c) => {
     return c.amount;
   });
+  const investmentCategories = monthlyInvestmentCategories.data?.map((c) => {
+    return c.category;
+  });
+  const investmentAmounts = monthlyInvestmentCategories.data?.map((c) => {
+    return c.amount;
+  });
 
   const expenseData: ChartData<"pie"> = {
     labels: expenseCategories,
     datasets: [
       {
-        label: "Expense by Category",
+        label: "Expenses by Category",
         data: expenseAmounts as number[],
         backgroundColor: [
           "rgba(165, 18, 96, 1)", // Blended with dark red
@@ -106,8 +150,30 @@ const MonthlyReport = () => {
 
     datasets: [
       {
-        label: "Expense by Category",
+        label: "Income by Category",
         data: incomeAmounts as number[],
+        backgroundColor: [
+          "rgba(60, 128, 70, 1)", // Blended with dark green
+          "rgba(98, 137, 204, 1)", // Blended with light blue
+          "rgba(94, 168, 134, 1)", // Blended with medium teal
+          "rgba(135, 111, 193, 1)", // Blended with light purple
+          "rgba(122, 193, 106, 1)", // Blended with medium green
+          "rgba(165, 140, 216, 1)", // Blended with medium light purple
+          "rgba(49, 96, 161, 1)", // Blended with dark blue
+          "rgba(156, 217, 128, 1)", // Blended with lighter green
+          "rgba(191, 201, 239, 1)", // Blended with lightest blue
+          "rgba(75, 127, 130, 1)", // Blended with green and blue
+        ],
+      },
+    ],
+  };
+  const investmentData: ChartData<"pie"> = {
+    labels: incomeCategories,
+
+    datasets: [
+      {
+        label: "Investments by Category",
+        data: investmentAmounts as number[],
         backgroundColor: [
           "rgba(60, 128, 70, 1)", // Blended with dark green
           "rgba(98, 137, 204, 1)", // Blended with light blue
@@ -136,7 +202,9 @@ const MonthlyReport = () => {
     monthlyExpenditure.isFetching ||
     monthlyIncome.isFetching ||
     monthlyExpenseCategories.isFetching ||
-    monthlyIncomeCategories.isFetching;
+    monthlyIncomeCategories.isFetching ||
+    monthlyInvestmentCategories.isFetching ||
+    monthlyInvestments.isFetching;
 
   const displayEmptyState =
     !isFetching && monthlyExpenditure.data === 0 && monthlyIncome.data === 0;
@@ -146,6 +214,8 @@ const MonthlyReport = () => {
 
   const displayIncome =
     !isFetching && !!monthlyIncome.data && monthlyIncome.data !== 0;
+  const displayInvestments =
+    !isFetching && !!monthlyInvestments.data && monthlyInvestments.data !== 0;
 
   return (
     <>
@@ -195,6 +265,15 @@ const MonthlyReport = () => {
                 graphOptions={options}
                 monthlyCategories={monthlyIncomeCategories.data}
                 monthlyTotal={monthlyIncome.data}
+              />
+            )}
+            {displayInvestments && (
+              <MonthlyCategories
+                title={"Monthly Investments"}
+                graphData={investmentData}
+                graphOptions={options}
+                monthlyCategories={monthlyInvestmentCategories.data}
+                monthlyTotal={monthlyInvestments.data}
               />
             )}
 
