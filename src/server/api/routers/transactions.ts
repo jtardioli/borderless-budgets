@@ -4,7 +4,7 @@ import {
 } from "~/schemas/transactions";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { z } from "zod";
-import { format, subYears, startOfYear, startOfMonth } from "date-fns";
+import { format, subYears, startOfYear } from "date-fns";
 import { CurrencyCode, convertCurrency } from "~/config/currencyExchange";
 
 type MonthlySummary = Record<string, { expenses: number; income: number }>;
@@ -22,23 +22,6 @@ export const transactionsRouter = createTRPCRouter({
         },
       ],
     });
-  }),
-  getBalance: protectedProcedure.query(async ({ ctx }) => {
-    const user = await ctx.prisma.user.findUnique({
-      where: {
-        id: ctx.session.user.id,
-      },
-      select: {
-        balance: true,
-      },
-    });
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    // Return the user's balance
-    return user.balance;
   }),
   getTotalByTransactionType: protectedProcedure
     .input(
@@ -77,59 +60,12 @@ export const transactionsRouter = createTRPCRouter({
         throw new Error("Invalid transaction type provided");
       }
     }),
-  getMonthlyIncome: protectedProcedure
-    .input(
-      z.object({
-        startOfMonth: z.union([z.date(), z.string()]),
-        endOfMonth: z.union([z.date(), z.string()]),
-      })
-    )
-    .query(async ({ input, ctx }) => {
-      const result = await ctx.prisma.transaction.aggregate({
-        where: {
-          userId: ctx.session.user.id,
-          type: TransactionType.INCOME,
-          date: {
-            gte: new Date(input.startOfMonth),
-            lt: new Date(input.endOfMonth),
-          },
-        },
-        _sum: {
-          amount: true,
-        },
-      });
 
-      return result._sum.amount || 0;
-    }),
-  getMonthlyInvestments: protectedProcedure
+  getCategories: protectedProcedure
     .input(
       z.object({
-        startOfMonth: z.union([z.date(), z.string()]),
-        endOfMonth: z.union([z.date(), z.string()]),
-      })
-    )
-    .query(async ({ input, ctx }) => {
-      const result = await ctx.prisma.transaction.aggregate({
-        where: {
-          userId: ctx.session.user.id,
-          type: TransactionType.INVESTMENT,
-          date: {
-            gte: new Date(input.startOfMonth),
-            lt: new Date(input.endOfMonth),
-          },
-        },
-        _sum: {
-          amount: true,
-        },
-      });
-
-      return result._sum.amount || 0;
-    }),
-  getMonthlyCategories: protectedProcedure
-    .input(
-      z.object({
-        startOfMonth: z.union([z.date(), z.string()]),
-        endOfMonth: z.union([z.date(), z.string()]),
+        startDate: z.union([z.date(), z.string()]),
+        endDate: z.union([z.date(), z.string()]),
         txType: z.enum([
           TransactionType.EXPENSE,
           TransactionType.INCOME,
@@ -144,8 +80,8 @@ export const transactionsRouter = createTRPCRouter({
           userId: ctx.session.user.id,
           type: input.txType,
           date: {
-            gte: new Date(input.startOfMonth),
-            lt: new Date(input.endOfMonth),
+            gte: new Date(input.startDate),
+            lt: new Date(input.endDate),
           },
         },
         _sum: {

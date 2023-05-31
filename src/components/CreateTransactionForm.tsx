@@ -10,23 +10,12 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { assertNever } from "~/utils/types";
-import { getEmptyTransaction } from "~/services/transactions";
+import {
+  getEmptyTransaction,
+  getTransactionTypeCategoryValues,
+} from "~/services/transactions";
 import { Oval } from "react-loading-icons";
 import { api } from "~/config/api";
-
-function getFormCategoryValues(formType: TransactionType): string[] {
-  switch (formType) {
-    case TransactionType.EXPENSE:
-      return Object.values(TransactionExpenseCategory);
-    case TransactionType.INCOME:
-      return Object.values(TransactionIncomeCategory);
-    case TransactionType.INVESTMENT:
-      return Object.values(TransactionInvestmentCategory);
-    default:
-      // Throw an error if none of the cases match
-      return assertNever(formType);
-  }
-}
 
 const CreateTransactionForm = () => {
   const [formData, setFormData] = useState<TransactionNew>(
@@ -37,7 +26,7 @@ const CreateTransactionForm = () => {
     TransactionType.EXPENSE
   );
 
-  const formCategoryType = getFormCategoryValues(formType);
+  const formCategoryType = getTransactionTypeCategoryValues(formType);
 
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target;

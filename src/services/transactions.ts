@@ -44,3 +44,19 @@ export function getEmptyTransaction(type: TransactionType) {
   // Throw an error if none of the cases match
   return assertNever(type);
 }
+
+export function getTransactionTypeCategoryValues(
+  formType: TransactionType
+): string[] {
+  switch (formType) {
+    case TransactionType.EXPENSE:
+      return Object.values(TransactionExpenseCategory);
+    case TransactionType.INCOME:
+      return Object.values(TransactionIncomeCategory);
+    case TransactionType.INVESTMENT:
+      return Object.values(TransactionInvestmentCategory);
+    default:
+      // Throw an error if none of the cases match
+      return assertNever(formType);
+  }
+}

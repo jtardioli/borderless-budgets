@@ -28,42 +28,42 @@ const MonthlyReport = () => {
   const { month } = router.query;
   const { data: session } = useSession({ required: true });
 
-  const monthlyExpenseCategories =
-    api.transactions.getMonthlyCategories.useQuery(
-      {
-        ...getMonthStartAndEnd(new Date(month as string)),
-        txType: TransactionType.EXPENSE,
-      },
-      {
-        enabled: session?.user !== undefined && !!month,
-        refetchOnWindowFocus: false,
-      }
-    );
-  const monthlyIncomeCategories =
-    api.transactions.getMonthlyCategories.useQuery(
-      {
-        ...getMonthStartAndEnd(new Date(month as string)),
-        txType: TransactionType.INCOME,
-      },
-      {
-        enabled: session?.user !== undefined && !!month,
-        refetchOnWindowFocus: false,
-      }
-    );
-  const monthlyInvestmentCategories =
-    api.transactions.getMonthlyCategories.useQuery(
-      {
-        ...getMonthStartAndEnd(new Date(month as string)),
-        txType: TransactionType.INVESTMENT,
-      },
-      {
-        enabled: session?.user !== undefined && !!month,
-        refetchOnWindowFocus: false,
-      }
-    );
-
   const { startOfMonth, endOfMonth } = getMonthStartAndEnd(
     new Date(month as string)
+  );
+
+  const monthlyExpenseCategories = api.transactions.getCategories.useQuery(
+    {
+      startDate: startOfMonth,
+      endDate: endOfMonth,
+      txType: TransactionType.EXPENSE,
+    },
+    {
+      enabled: session?.user !== undefined && !!month,
+      refetchOnWindowFocus: false,
+    }
+  );
+  const monthlyIncomeCategories = api.transactions.getCategories.useQuery(
+    {
+      startDate: startOfMonth,
+      endDate: endOfMonth,
+      txType: TransactionType.INCOME,
+    },
+    {
+      enabled: session?.user !== undefined && !!month,
+      refetchOnWindowFocus: false,
+    }
+  );
+  const monthlyInvestmentCategories = api.transactions.getCategories.useQuery(
+    {
+      startDate: startOfMonth,
+      endDate: endOfMonth,
+      txType: TransactionType.INVESTMENT,
+    },
+    {
+      enabled: session?.user !== undefined && !!month,
+      refetchOnWindowFocus: false,
+    }
   );
 
   const monthlyExpenditure =
@@ -168,7 +168,7 @@ const MonthlyReport = () => {
     ],
   };
   const investmentData: ChartData<"pie"> = {
-    labels: incomeCategories,
+    labels: investmentCategories,
 
     datasets: [
       {

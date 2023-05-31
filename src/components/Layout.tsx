@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, { type ReactNode, type FC } from "react";
 import { AiFillHome } from "react-icons/ai";
 import { IoMdSettings } from "react-icons/io";
-import { MdCalendarMonth } from "react-icons/md";
+import { MdCalendarMonth, MdOutlineCurrencyExchange } from "react-icons/md";
 import { BsFillPieChartFill } from "react-icons/bs";
 import NavItem from "./NavItem";
 
@@ -15,9 +15,9 @@ type Props = {
 const Layout: FC<Props> = ({ children }) => {
   const { data: session } = useSession();
   return (
-    <div className="flex w-screen">
-      <div className="hidden w-20  sm:block lg:min-w-[230px]"></div>
-      <div className="fixed  hidden h-screen w-20  flex-col items-center justify-start bg-slate-100 bg-gradient-to-br py-[5vh] drop-shadow-md sm:flex lg:min-w-[230px]">
+    <div className="flex w-full">
+      <div className="hidden w-20  sm:block lg:min-w-[270px]"></div>
+      <div className="fixed  hidden h-screen w-20  flex-col items-center justify-start bg-slate-100 bg-gradient-to-br py-[5vh] drop-shadow-md sm:flex lg:min-w-[270px]">
         <div className="flex flex-col">
           {session && (
             <div className="flex items-center gap-2">
@@ -71,6 +71,17 @@ const Layout: FC<Props> = ({ children }) => {
                 />
                 <h2 className="mt-[2px] hidden text-lg lg:block">
                   Year In Review
+                </h2>
+              </div>
+            </Link>
+            <Link href="/transactions">
+              <div className="flex justify-center  py-2">
+                <MdOutlineCurrencyExchange
+                  size={30}
+                  className="text-indigo-600 lg:mr-4"
+                />
+                <h2 className="mt-[2px] hidden text-lg lg:block">
+                  Transactions
                 </h2>
               </div>
             </Link>

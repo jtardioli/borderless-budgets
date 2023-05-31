@@ -1,64 +1,70 @@
 import { useRef } from "react";
 
-import { RiDeleteBinFill } from "react-icons/ri";
-import { GiExpense, GiReceiveMoney } from "react-icons/gi";
-
 import { type NextPage } from "next";
 import { api } from "~/config/api";
 import { TransactionType } from "~/schemas/transactions";
 import { formatCurrency } from "~/utils/currency";
 import { useSession } from "next-auth/react";
 import Layout from "~/components/Layout";
-import { Oval } from "react-loading-icons";
 import Skeleton from "~/components/Skeleton";
 import { getMonthStartAndEnd } from "~/utils/dates";
-import { format } from "date-fns";
+
 import Head from "next/head";
 
-import {
-  AiFillCloseCircle,
-  AiOutlinePlus,
-  AiOutlineStock,
-} from "react-icons/ai";
+import { AiFillCloseCircle, AiOutlinePlus } from "react-icons/ai";
 import CreateTransactionForm from "~/components/CreateTransactionForm";
+import TransactionCard from "~/components/TransactionCard";
 
 const Home: NextPage = () => {
   const { data: session } = useSession({ required: true });
-
-  const utils = api.useContext();
 
   const { data: transactions } = api.transactions.getAll.useQuery(
     undefined, // no input
     { enabled: session?.user !== undefined }
   );
-  const { data: balance } = api.transactions.getBalance.useQuery(
+  const { data: balance } = api.users.getBalance.useQuery(
     undefined, // no input,
     {
       enabled: session?.user !== undefined,
     }
   );
-  const { data: monthlyExpenditure } =
-    api.transactions.getMonthlyExpenditure.useQuery(getMonthStartAndEnd(), {
-      enabled: session?.user !== undefined,
-    });
 
-  const { data: monthlyIncome } = api.transactions.getMonthlyIncome.useQuery(
-    getMonthStartAndEnd(),
-    {
-      enabled: session?.user !== undefined,
-    }
-  );
+  const { startOfMonth, endOfMonth } = getMonthStartAndEnd();
+  const { data: monthlyExpenditure } =
+    api.transactions.getTotalByTransactionType.useQuery(
+      {
+        startDate: startOfMonth,
+        endDate: endOfMonth,
+        txType: TransactionType.EXPENSE,
+      },
+      {
+        enabled: session?.user !== undefined,
+      }
+    );
+
+  const { data: monthlyIncome } =
+    api.transactions.getTotalByTransactionType.useQuery(
+      {
+        startDate: startOfMonth,
+        endDate: endOfMonth,
+        txType: TransactionType.EXPENSE,
+      },
+      {
+        enabled: session?.user !== undefined,
+      }
+    );
 
   const { data: monthlyInvestments } =
-    api.transactions.getMonthlyInvestments.useQuery(getMonthStartAndEnd(), {
-      enabled: session?.user !== undefined,
-    });
-
-  const deleteTx = api.transactions.delete.useMutation({
-    async onSuccess(input) {
-      await utils.transactions.invalidate();
-    },
-  });
+    api.transactions.getTotalByTransactionType.useQuery(
+      {
+        startDate: startOfMonth,
+        endDate: endOfMonth,
+        txType: TransactionType.EXPENSE,
+      },
+      {
+        enabled: session?.user !== undefined,
+      }
+    );
 
   const modalRef = useRef<HTMLDialogElement>(null);
 
@@ -140,7 +146,7 @@ const Home: NextPage = () => {
                 Recent Transactions
               </h1>
 
-              <div className="max-h-[50vh] min-h-[50vh] overflow-y-auto rounded-md border-[1px]  border-gray-300  bg-white py-4 drop-shadow-sm md:max-h-[62vh] md:min-h-[62vh]">
+              <div className="max-h-[50vh] min-h-[40vh] overflow-y-auto rounded-md border-[1px]  border-gray-300  bg-white py-4 drop-shadow-sm md:max-h-[62vh] md:min-h-[62vh]">
                 {!transactions &&
                   [...(Array(5) as number[])].map((_, i) => {
                     return (
@@ -176,67 +182,7 @@ const Home: NextPage = () => {
                 )}
 
                 {transactions?.map((tx) => {
-                  return (
-                    <div
-                      key={tx.id}
-                      className="flex w-full items-center justify-between px-4  text-gray-700 md:px-8"
-                    >
-                      <div className="flex w-full items-center justify-between border-b-[1px] border-slate-200 py-4 ">
-                        <div className="hidden flex-1 items-center sm:flex">
-                          {tx.type === TransactionType.EXPENSE && (
-                            <GiExpense
-                              size={40}
-                              className="text-gray-900 text-red-900"
-                            />
-                          )}
-                          {tx.type === TransactionType.INCOME && (
-                            <GiReceiveMoney
-                              size={40}
-                              className="text-gray-900 text-green-900"
-                            />
-                          )}
-                          {tx.type === TransactionType.INVESTMENT && (
-                            <AiOutlineStock
-                              size={40}
-                              className="text-blue-900 text-gray-900"
-                            />
-                          )}
-                        </div>
-
-                        <div className="flex flex-[1.5] flex-col sm:flex-1  md:flex-[2]">
-                          <p className="text-sm font-medium capitalize sm:text-base">
-                            {tx.description}
-                          </p>
-                          <p className="text-xs text-gray-600 sm:text-sm">
-                            {tx.category}
-                          </p>
-                        </div>
-                        <p className="flex-[1.3] text-sm sm:text-base ">
-                          {`${
-                            tx.type === TransactionType.EXPENSE ? "-" : ""
-                          }${formatCurrency(tx.amount, "USD")}`}
-                        </p>
-                        <p className="flex-1 text-sm sm:text-base">
-                          {format(new Date(tx.date), "dd/MM/yyyy ")}
-                        </p>
-                        <div className="flex flex-[0.6] items-center justify-end sm:flex-[1]">
-                          {deleteTx.isLoading &&
-                          deleteTx?.variables?.id === tx.id ? (
-                            <Oval stroke="#C53030" width="20px" />
-                          ) : (
-                            <RiDeleteBinFill
-                              className="text-gray-900 hover:text-red-800"
-                              onClick={() => {
-                                deleteTx.mutate({ id: tx.id });
-                              }}
-                              style={{ cursor: "pointer" }}
-                              size={23}
-                            />
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
+                  return <TransactionCard key={tx.id} tx={tx} />;
                 })}
               </div>
             </div>
