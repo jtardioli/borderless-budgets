@@ -146,7 +146,7 @@ const Home: NextPage = () => {
                 Recent Transactions
               </h1>
 
-              <div className="max-h-[50vh] min-h-[40vh] overflow-y-auto rounded-md border-[1px]  border-gray-300  bg-white py-4 drop-shadow-sm md:max-h-[62vh] md:min-h-[62vh]">
+              <div className="max-h-[40vh] min-h-[40vh] overflow-y-auto rounded-md border-[1px]  border-gray-300  bg-white py-4 drop-shadow-sm md:max-h-[62vh] md:min-h-[62vh]">
                 {!transactions &&
                   [...(Array(5) as number[])].map((_, i) => {
                     return (
