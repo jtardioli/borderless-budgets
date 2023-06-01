@@ -10,16 +10,27 @@ import DatePicker from "react-datepicker";
 import { useState } from "react";
 import { TransactionType } from "~/schemas/transactions";
 import { getTransactionTypeCategoryValues } from "~/services/transactions";
+import { type Transaction } from "@prisma/client";
 
 const Transactions: NextPage = () => {
   const { data: session } = useSession({ required: true });
 
   const [filters, setFilters] = useState({ description: "" });
 
-  const { data: transactions } = api.transactions.getAll.useQuery(
-    undefined, // no input
+  const { data } = api.transactions.getAllPaginated.useInfiniteQuery(
+    {
+      limit: 10,
+    }, // no input
     { enabled: session?.user !== undefined }
   );
+
+  // convert pages into a single array
+  const transactions = data
+    ? data.pages.reduce<Transaction[]>(
+        (acc, curr) => [...acc, ...curr.transactions],
+        []
+      )
+    : [];
 
   const [formType, setFormType] = useState<TransactionType>(
     TransactionType.EXPENSE

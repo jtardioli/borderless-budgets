@@ -1,15 +1,8 @@
 import React, { useState, type ChangeEvent, type FormEvent } from "react";
 import { CurrencyCode } from "~/config/currencyExchange";
-import {
-  TransactionExpenseCategory,
-  TransactionIncomeCategory,
-  TransactionInvestmentCategory,
-  type TransactionNew,
-  TransactionType,
-} from "~/schemas/transactions";
+import { type TransactionNew, TransactionType } from "~/schemas/transactions";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { assertNever } from "~/utils/types";
 import {
   getEmptyTransaction,
   getTransactionTypeCategoryValues,

@@ -47,7 +47,7 @@ const Home: NextPage = () => {
       {
         startDate: startOfMonth,
         endDate: endOfMonth,
-        txType: TransactionType.EXPENSE,
+        txType: TransactionType.INCOME,
       },
       {
         enabled: session?.user !== undefined,
@@ -59,7 +59,7 @@ const Home: NextPage = () => {
       {
         startDate: startOfMonth,
         endDate: endOfMonth,
-        txType: TransactionType.EXPENSE,
+        txType: TransactionType.INVESTMENT,
       },
       {
         enabled: session?.user !== undefined,
