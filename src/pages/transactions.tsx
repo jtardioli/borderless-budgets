@@ -26,25 +26,25 @@ const Transactions: NextPage = () => {
     );
 
   const lastItemRef = useRef(null);
-  const [isIntersecting, setIntersecting] = useState(false);
+  // const [isIntersecting, setIntersecting] = useState(false);
 
-  const observer = useMemo(
-    () =>
-      new IntersectionObserver(([entry]) => {
-        if (entry) {
-          setIntersecting(entry.isIntersecting);
-        }
-      }),
-    [lastItemRef]
-  );
+  // const observer = useMemo(
+  //   () =>
+  //     new IntersectionObserver(([entry]) => {
+  //       if (entry) {
+  //         setIntersecting(entry.isIntersecting);
+  //       }
+  //     }),
+  //   [lastItemRef]
+  // );
 
-  useEffect(() => {
-    if (lastItemRef.current) {
-      observer.observe(lastItemRef.current);
-    }
+  // useEffect(() => {
+  //   if (lastItemRef.current) {
+  //     observer.observe(lastItemRef.current);
+  //   }
 
-    return () => observer.disconnect();
-  }, []);
+  //   return () => observer.disconnect();
+  // }, []);
 
   // Convert pages into a single array
   const transactions = data
