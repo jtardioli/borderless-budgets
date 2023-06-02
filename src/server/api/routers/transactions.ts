@@ -27,28 +27,21 @@ export const transactionsRouter = createTRPCRouter({
     .input(
       z.object({
         limit: z.number().min(1).max(100),
-        cursor: z.string().nullish(),
+        cursor: z.string().optional(),
       })
     )
     .query(async ({ input, ctx }) => {
       const transactions = await ctx.prisma.transaction.findMany({
         take: input.limit + 1, // get an extra item at the end which we'll use as next cursor
-        cursor: { id: input.cursor || undefined },
         where: { userId: ctx.session.user.id },
-        orderBy: [
-          {
-            date: "desc",
-          },
-          {
-            createdAt: "desc",
-          },
-        ],
+        cursor: input.cursor ? { id: input.cursor } : undefined,
+        orderBy: { id: "desc" },
       });
 
-      const lastTransactionInResults = transactions[input.limit - 1];
-      const nextCursor = lastTransactionInResults
-        ? lastTransactionInResults.id
-        : undefined;
+      let nextCursor: typeof input.cursor | undefined = undefined;
+      if (transactions.length > input.limit) {
+        nextCursor = transactions.pop()!.id;
+      }
 
       return {
         transactions,

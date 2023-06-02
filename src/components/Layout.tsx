@@ -7,6 +7,7 @@ import { IoMdSettings } from "react-icons/io";
 import { MdCalendarMonth, MdOutlineCurrencyExchange } from "react-icons/md";
 import { BsFillPieChartFill } from "react-icons/bs";
 import NavItem from "./NavItem";
+import { format } from "date-fns";
 
 type Props = {
   children: ReactNode;
@@ -52,7 +53,7 @@ const Layout: FC<Props> = ({ children }) => {
                 <h2 className="mt-[2px] hidden text-lg lg:block">Dashboard</h2>
               </div>
             </Link>
-            <Link href={`/monthly-report/${String(new Date())}`}>
+            <Link href={`/monthly-report/${format(new Date(), "yyyy-MM-dd")}`}>
               <div className="flex justify-center  py-2">
                 <BsFillPieChartFill
                   size={30}
@@ -100,7 +101,7 @@ const Layout: FC<Props> = ({ children }) => {
           <AiFillHome size={30} className="text-indigo-600 lg:mr-4" />
         </NavItem>
 
-        <Link href={`/monthly-report/${String(new Date())}`}>
+        <Link href={`/monthly-report/${format(new Date(), "yyyy-MM-dd")}`}>
           <div className="flex justify-center  py-2">
             <BsFillPieChartFill size={30} className="text-indigo-600 lg:mr-4" />
             <h2 className="mt-[2px] hidden text-lg lg:block">Monthly Report</h2>

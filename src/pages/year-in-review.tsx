@@ -7,6 +7,7 @@ import { Grid, Oval } from "react-loading-icons";
 import Layout from "~/components/Layout";
 import { api } from "~/config/api";
 import { formatCurrency } from "~/utils/currency";
+import { format } from "date-fns";
 
 const YearInReview: NextPage = () => {
   const { data, isFetching } = api.transactions.getYearInReview.useQuery();
@@ -35,7 +36,10 @@ const YearInReview: NextPage = () => {
                 return (
                   <Link
                     key={date}
-                    href={`/monthly-report/${String(new Date(date))}`}
+                    href={`/monthly-report/${format(
+                      new Date(date),
+                      "yyyy-MM-dd"
+                    )}`}
                   >
                     <div className="flex h-[130px]  w-[250px] flex-col items-start  justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-500 px-4 text-lg font-medium tracking-wider text-white text-opacity-90 shadow-inner">
                       <h4 className=" opacity-85 text-sm ">{date}</h4>
