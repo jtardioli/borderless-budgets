@@ -7,17 +7,46 @@ import Layout from "~/components/Layout";
 import Head from "next/head";
 import TransactionCard from "~/components/TransactionCard";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type ChangeEvent, useCallback, useRef, useState } from "react";
 
 import { type Transaction } from "@prisma/client";
+import { Oval } from "react-loading-icons";
+import {
+  type TransactionExpenseCategory,
+  type TransactionIncomeCategory,
+  type TransactionInvestmentCategory,
+  TransactionType,
+} from "~/schemas/transactions";
+import { ALL } from "~/config/constants";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+import { getTransactionTypeCategoryValues } from "~/services/transactions";
 
 const Transactions: NextPage = () => {
   const { data: session } = useSession({ required: true });
 
-  const { data, fetchNextPage } =
+  const [searchParams, setSearchParams] = useState({
+    description: "",
+    txType: ALL as "all" | TransactionType,
+    category: ALL as
+      | "all"
+      | TransactionExpenseCategory
+      | TransactionIncomeCategory
+      | TransactionInvestmentCategory,
+    startDate: undefined as Date | undefined,
+    endDate: undefined as Date | undefined,
+  });
+
+  const formCategoryType = getTransactionTypeCategoryValues(
+    searchParams.txType
+  );
+
+  const { data, fetchNextPage, isFetching, hasNextPage } =
     api.transactions.getAllPaginated.useInfiniteQuery(
       {
-        limit: 20,
+        limit: 30,
+        ...searchParams,
       },
       {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -25,27 +54,26 @@ const Transactions: NextPage = () => {
       }
     );
 
-  const lastItemRef = useRef(null);
-  // const [isIntersecting, setIntersecting] = useState(false);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isFetching) return;
+      if (observer.current) {
+        observer.current.disconnect();
+      }
 
-  // const observer = useMemo(
-  //   () =>
-  //     new IntersectionObserver(([entry]) => {
-  //       if (entry) {
-  //         setIntersecting(entry.isIntersecting);
-  //       }
-  //     }),
-  //   [lastItemRef]
-  // );
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0]!.isIntersecting && hasNextPage) {
+          fetchNextPage().catch((err) => {
+            console.log(err);
+          });
+        }
+      });
 
-  // useEffect(() => {
-  //   if (lastItemRef.current) {
-  //     observer.observe(lastItemRef.current);
-  //   }
-
-  //   return () => observer.disconnect();
-  // }, []);
-
+      if (node) observer.current.observe(node);
+    },
+    [isFetching, hasNextPage]
+  );
   // Convert pages into a single array
   const transactions = data
     ? data.pages.reduce<Transaction[]>(
@@ -62,23 +90,147 @@ const Transactions: NextPage = () => {
       <Layout>
         <main className="flex min-h-screen w-full bg-slate-200 py-5">
           <section className="flex w-full justify-center">
-            <div className="flex w-[60%] flex-col">
+            <div className="flex w-[60%] flex-col items-center">
               <h1 className="mb-2 pl-8 text-xl">Your Transactions</h1>
               {transactions?.map((tx, index) => {
                 const isLastItem = index === transactions.length - 1;
                 if (isLastItem) {
                   return (
-                    <div key={tx.id} ref={lastItemRef}>
+                    <div className="w-full" key={tx.id} ref={lastElementRef}>
                       <TransactionCard tx={tx} />
                     </div>
                   );
                 }
                 return <TransactionCard key={tx.id} tx={tx} />;
               })}
+              {isFetching && <Oval stroke="black" />}
             </div>
           </section>
           <div className="w-[330px]"></div>
-          <section className="fixed right-0 top-0 h-screen w-[330px] flex-col  bg-slate-100 py-[5vh] drop-shadow-md"></section>
+          <section className="fixed right-0 top-0 flex h-screen w-[330px] flex-col gap-6  bg-slate-100 px-4 py-[5vh] drop-shadow-md">
+            <div className="flex flex-col ">
+              <label className="text mb-2 text-gray-500" htmlFor="description">
+                Search Description:
+              </label>
+              <input
+                className="h-[40px] rounded-md border-[1px] border-gray-500 px-2 shadow-inner outline-none"
+                placeholder="Uber"
+                type="text"
+                id="description"
+                name="description"
+                value={searchParams.description}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  setSearchParams((prev) => {
+                    return { ...prev, description: e.target.value };
+                  });
+                }}
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="mb-2  text-gray-500" htmlFor="tx-type">
+                Transaction Type:
+              </label>
+              <select
+                className="h-[40px] cursor-pointer rounded-md border-[1px] border-gray-500 px-2 shadow-inner outline-none"
+                id="tx-type"
+                name="tx-type"
+                value={searchParams.txType}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                  setSearchParams((prev) => {
+                    return {
+                      ...prev,
+                      txType: e.target.value as "all" | TransactionType,
+                    };
+                  });
+                }}
+              >
+                <option value={ALL}>All Types</option>
+                {Object.values(TransactionType).map((txType) => (
+                  <option key={txType} value={txType}>
+                    {txType}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex flex-col">
+              <label className="mb-2 text-gray-500" htmlFor="category">
+                Category:
+              </label>
+              <select
+                className="h-[40px] cursor-pointer rounded-md border-[1px] border-gray-500 px-2 shadow-inner outline-none"
+                id="category"
+                name="category"
+                value={searchParams.category}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                  setSearchParams((prev) => {
+                    return {
+                      ...prev,
+                      category: e.target.value as
+                        | "all"
+                        | TransactionExpenseCategory
+                        | TransactionIncomeCategory
+                        | TransactionInvestmentCategory,
+                    };
+                  });
+                }}
+              >
+                <option value={ALL}>All Categories</option>
+                {Object.values(formCategoryType).map((category, i) => (
+                  <option key={i} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex flex-col">
+              <label className="mb-2 text-gray-500" htmlFor="date">
+                Date:
+              </label>
+              <div className="flex items-end gap-4">
+                <div>
+                  <p className="mb-2 text-xs text-gray-700">From</p>
+                  <DatePicker
+                    className="h-[40px] w-full rounded-md border-[1px] border-gray-500 px-2 shadow-inner outline-none"
+                    placeholderText="04/03/2023"
+                    selected={searchParams.startDate as Date}
+                    onChange={(date) => {
+                      setSearchParams((prev) => ({
+                        ...prev,
+                        startDate: date || undefined,
+                      }));
+                    }}
+                  />
+                </div>
+                <div>
+                  <p className="mb-2 text-xs text-gray-700">To</p>
+                  <DatePicker
+                    className="h-[40px] w-full rounded-md border-[1px] border-gray-500 px-2 shadow-inner outline-none"
+                    placeholderText="04/03/2023"
+                    selected={searchParams.endDate as Date}
+                    onChange={(date) => {
+                      setSearchParams((prev) => ({
+                        ...prev,
+                        endDate: date || undefined,
+                      }));
+                    }}
+                  />
+                </div>
+
+                <button
+                  className="h-[40px] w-[60px] rounded-md border-[1px] border-gray-500 px-2 shadow-inner outline-none"
+                  onClick={() => {
+                    setSearchParams((prev) => ({
+                      ...prev,
+                      endDate: undefined,
+                      startDate: undefined,
+                    }));
+                  }}
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+          </section>
         </main>
       </Layout>
     </>

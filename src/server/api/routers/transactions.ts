@@ -1,4 +1,8 @@
 import {
+  TransactionCategoryObject,
+  TransactionExpenseCategory,
+  TransactionIncomeCategory,
+  TransactionInvestmentCategory,
   TransactionType,
   TransactionWithoutIdSchema,
 } from "~/schemas/transactions";
@@ -6,6 +10,9 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { z } from "zod";
 import { format, subYears, startOfYear } from "date-fns";
 import { CurrencyCode, convertCurrency } from "~/config/currencyExchange";
+import { ALL } from "~/config/constants";
+import "react-datepicker/dist/react-datepicker.css";
+import { endOfDay } from "date-fns";
 
 type MonthlySummary = Record<string, { expenses: number; income: number }>;
 
@@ -28,12 +35,36 @@ export const transactionsRouter = createTRPCRouter({
       z.object({
         limit: z.number().min(1).max(100),
         cursor: z.string().optional(),
+        description: z.string().optional(),
+        txType: z.enum([
+          ALL,
+          TransactionType.EXPENSE,
+          TransactionType.INCOME,
+          TransactionType.INVESTMENT,
+        ]),
+        category: z.union([
+          z.literal(ALL),
+          z.nativeEnum(TransactionExpenseCategory),
+          z.nativeEnum(TransactionIncomeCategory),
+          z.nativeEnum(TransactionInvestmentCategory),
+        ]),
+        startDate: z.date().optional(),
+        endDate: z.date().optional(),
       })
     )
     .query(async ({ input, ctx }) => {
       const transactions = await ctx.prisma.transaction.findMany({
         take: input.limit + 1, // get an extra item at the end which we'll use as next cursor
-        where: { userId: ctx.session.user.id },
+        where: {
+          userId: ctx.session.user.id,
+          description: { contains: input.description },
+          type: input.txType === ALL ? undefined : input.txType,
+          category: input.category === ALL ? undefined : input.category,
+          date: {
+            gte: input.startDate ? new Date(input.startDate) : undefined,
+            lt: input.endDate ? endOfDay(new Date(input.endDate)) : undefined,
+          },
+        },
         cursor: input.cursor ? { id: input.cursor } : undefined,
         orderBy: { id: "desc" },
       });

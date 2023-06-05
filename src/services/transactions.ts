@@ -6,6 +6,7 @@ import {
   TransactionType,
 } from "~/schemas/transactions";
 import { assertNever } from "~/utils/types";
+import { ALL } from "~/config/constants";
 
 export function getEmptyTransaction(type: TransactionType) {
   if (type === TransactionType.EXPENSE) {
@@ -46,9 +47,15 @@ export function getEmptyTransaction(type: TransactionType) {
 }
 
 export function getTransactionTypeCategoryValues(
-  formType: TransactionType
+  formType: "all" | TransactionType
 ): string[] {
   switch (formType) {
+    case ALL:
+      return [
+        ...Object.values(TransactionExpenseCategory),
+        ...Object.values(TransactionIncomeCategory),
+        ...Object.values(TransactionInvestmentCategory),
+      ];
     case TransactionType.EXPENSE:
       return Object.values(TransactionExpenseCategory);
     case TransactionType.INCOME:
