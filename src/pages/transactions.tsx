@@ -91,7 +91,10 @@ const Transactions: NextPage = () => {
         <main className="flex min-h-screen w-full bg-slate-200 py-5">
           <section className="flex w-full justify-center">
             <div className="flex w-[60%] flex-col items-center">
-              <h1 className="mb-2 pl-8 text-xl">Your Transactions</h1>
+              <div className="w-full">
+                <h1 className="mb-8 ml-8 text-2xl">Your Transactions</h1>
+              </div>
+
               {transactions?.map((tx, index) => {
                 const isLastItem = index === transactions.length - 1;
                 if (isLastItem) {
