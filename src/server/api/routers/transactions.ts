@@ -17,19 +17,6 @@ import { endOfDay } from "date-fns";
 type MonthlySummary = Record<string, { expenses: number; income: number }>;
 
 export const transactionsRouter = createTRPCRouter({
-  getAll: protectedProcedure.query(async ({ ctx }) => {
-    return await ctx.prisma.transaction.findMany({
-      where: { userId: ctx.session.user.id },
-      orderBy: [
-        {
-          date: "desc",
-        },
-        {
-          createdAt: "desc",
-        },
-      ],
-    });
-  }),
   getAllPaginated: protectedProcedure
     .input(
       z.object({
@@ -42,12 +29,14 @@ export const transactionsRouter = createTRPCRouter({
           TransactionType.INCOME,
           TransactionType.INVESTMENT,
         ]),
-        category: z.union([
-          z.literal(ALL),
-          z.nativeEnum(TransactionExpenseCategory),
-          z.nativeEnum(TransactionIncomeCategory),
-          z.nativeEnum(TransactionInvestmentCategory),
-        ]),
+        category: z
+          .union([
+            z.literal(ALL),
+            z.nativeEnum(TransactionExpenseCategory),
+            z.nativeEnum(TransactionIncomeCategory),
+            z.nativeEnum(TransactionInvestmentCategory),
+          ])
+          .optional(),
         startDate: z.date().optional(),
         endDate: z.date().optional(),
       })

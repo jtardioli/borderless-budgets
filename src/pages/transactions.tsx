@@ -7,7 +7,13 @@ import Layout from "~/components/Layout";
 import Head from "next/head";
 import TransactionCard from "~/components/TransactionCard";
 
-import { type ChangeEvent, useCallback, useRef, useState } from "react";
+import {
+  type ChangeEvent,
+  useCallback,
+  useRef,
+  useState,
+  useEffect,
+} from "react";
 
 import { type Transaction } from "@prisma/client";
 import { Oval } from "react-loading-icons";
@@ -22,6 +28,12 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import { getTransactionTypeCategoryValues } from "~/services/transactions";
+import {
+  BsChevronBarLeft,
+  BsChevronLeft,
+  BsChevronRight,
+} from "react-icons/bs";
+import { AiFillCloseCircle } from "react-icons/ai";
 
 const Transactions: NextPage = () => {
   const { data: session } = useSession({ required: true });
@@ -82,6 +94,10 @@ const Transactions: NextPage = () => {
       )
     : [];
 
+  const [isSearchFormVisible, setIsSearchFormVisible] = useState(false);
+
+  const fixedSectionRef = useRef(null);
+
   return (
     <>
       <Head>
@@ -90,7 +106,7 @@ const Transactions: NextPage = () => {
       <Layout>
         <main className="flex min-h-screen w-full bg-slate-200 py-5">
           <section className="flex w-full justify-center">
-            <div className="flex w-[60%] flex-col items-center">
+            <div className="flex w-full flex-col items-center pr-8 sm:pr-4 xl:w-[80%] 2xl:w-[70%]">
               <div className="w-full">
                 <h1 className="mb-8 ml-8 text-2xl">Your Transactions</h1>
               </div>
@@ -109,8 +125,36 @@ const Transactions: NextPage = () => {
               {isFetching && <Oval stroke="black" />}
             </div>
           </section>
-          <div className="w-[330px]"></div>
-          <section className="fixed right-0 top-0 flex h-screen w-[330px] flex-col gap-6  bg-slate-100 px-4 py-[5vh] drop-shadow-md">
+
+          <button
+            className={`fixed right-0 top-20 z-10 h-[70px] rounded-s-md bg-gradient-to-br from-indigo-600 to-indigo-500 drop-shadow-xl transition-transform duration-300 xl:hidden  ${
+              !isSearchFormVisible
+                ? "translate-x-0 transform"
+                : "-translate-x-[329px] transform"
+            }`}
+            onClick={() => {
+              setIsSearchFormVisible((prevVisible) => !prevVisible);
+            }}
+          >
+            <BsChevronRight
+              size={30}
+              color="white"
+              className={`transition-transform duration-200  ${
+                !isSearchFormVisible
+                  ? "rotate-180 transform"
+                  : "rotate-0 transform"
+              }`}
+            />
+          </button>
+          <div className="hidden h-screen w-[350px] xl:block"></div>
+          <section
+            className={`fixed right-0 top-0 h-screen w-[330px] flex-col gap-6 bg-slate-100 px-4 py-[5vh] drop-shadow-md transition-transform duration-300 ${
+              isSearchFormVisible
+                ? "translate-x-0 transform"
+                : "translate-x-full transform"
+            } xl:translate-x-0`}
+            ref={fixedSectionRef}
+          >
             <div className="flex flex-col ">
               <label className="text mb-2 text-gray-500" htmlFor="description">
                 Search Description:

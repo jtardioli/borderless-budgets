@@ -14,14 +14,30 @@ import Head from "next/head";
 import { AiFillCloseCircle, AiOutlinePlus } from "react-icons/ai";
 import CreateTransactionForm from "~/components/CreateTransactionForm";
 import TransactionCard from "~/components/TransactionCard";
+import { ALL } from "~/config/constants";
+import { type Transaction } from "@prisma/client";
 
 const Home: NextPage = () => {
   const { data: session } = useSession({ required: true });
 
-  const { data: transactions } = api.transactions.getAll.useQuery(
-    undefined, // no input
-    { enabled: session?.user !== undefined }
+  const { data: txData } = api.transactions.getAllPaginated.useInfiniteQuery(
+    {
+      limit: 20,
+      txType: ALL,
+    },
+    {
+      enabled: session?.user !== undefined,
+    }
   );
+
+  // Convert pages into a single array
+  const transactions = txData
+    ? txData.pages.reduce<Transaction[]>(
+        (acc, curr) => [...acc, ...curr.transactions],
+        []
+      )
+    : [];
+
   const { data: balance } = api.users.getBalance.useQuery(
     undefined, // no input,
     {
