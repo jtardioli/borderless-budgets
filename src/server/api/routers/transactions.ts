@@ -20,7 +20,7 @@ export const transactionsRouter = createTRPCRouter({
     .input(
       z.object({
         limit: z.number().min(1).max(100),
-        cursor: z.string().optional(),
+        cursor: z.string().optional(), // Assuming `id` is a unique number field
         description: z.string().optional(),
         txType: z.enum([
           ALL,
@@ -53,13 +53,16 @@ export const transactionsRouter = createTRPCRouter({
             lt: input.endDate ? endOfDay(new Date(input.endDate)) : undefined,
           },
         },
-        cursor: input.cursor ? { id: input.cursor } : undefined,
-        orderBy: { id: "desc" },
+        cursor: input.cursor
+          ? { id: input.cursor } // Assume 'id' as the unique field
+          : undefined,
+        orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       });
 
       let nextCursor: typeof input.cursor | undefined = undefined;
       if (transactions.length > input.limit) {
-        nextCursor = transactions.pop()!.id;
+        const lastTransaction = transactions.pop();
+        nextCursor = lastTransaction!.id;
       }
 
       return {
@@ -67,6 +70,7 @@ export const transactionsRouter = createTRPCRouter({
         nextCursor,
       };
     }),
+
   getTotalByTransactionType: protectedProcedure
     .input(
       z.object({
