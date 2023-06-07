@@ -2,13 +2,7 @@
 
 [Live App](https://borderless-budgets.josht.art)
 
-As a digital nomad traveling in Brazil, I found it frustrating to keep track of my expenses and income while constantly converting between different currencies. That's why I created Borderless Budgets, a web application designed to help people like me keep track of their finances while traveling across borders.
-
-Borderless Budgets allows users to easily enter their expenses and income in their currency pf choice, and the app automatically converts them to their home currency using an API. The app also displays useful information such as the user's total balance, monthly expenses, and income.
-
-The app features interactive charts that display monthly data, making it easy to track spending and identify trends over time. In addition, the yearly review page allows users to see their monthly stats from any month in the previous year.
-
-I hope that Borderless Budgets will be a useful tool for other digital nomads who, like me, want to stay on top of their finances while traveling across borders.
+Introducing Borderless Budgets, a web app for digital nomads traveling in Brazil. It simplifies expense and income tracking across different currencies. Enter your finances in your preferred currency, and the app converts them automatically. With interactive charts and a yearly review feature, staying on top of your finances is effortless.
 
 ## The Stack
 
