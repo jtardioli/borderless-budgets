@@ -1,5 +1,4 @@
 import {
-  TransactionCategoryObject,
   TransactionExpenseCategory,
   TransactionIncomeCategory,
   TransactionInvestmentCategory,

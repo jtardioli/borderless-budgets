@@ -5,11 +5,11 @@ import {
   type DefaultSession,
 } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
 import DiscordProvider from "next-auth/providers/discord";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
-import { TIMEOUT } from "dns";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -38,15 +38,6 @@ declare module "next-auth" {
  * @see https://next-auth.js.org/configuration/options
  */
 export const authOptions: NextAuthOptions = {
-  callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
-  },
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -56,22 +47,46 @@ export const authOptions: NextAuthOptions = {
         timeout: 40000,
       },
     }),
+    CredentialsProvider({
+      name: "Credentials",
 
-    // DiscordProvider({
-    //   clientId: env.DISCORD_CLIENT_ID,
-    //   clientSecret: env.DISCORD_CLIENT_SECRET,
-    // }),
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
+      credentials: {
+        email: { label: "Email", type: "email", placeholder: "test@test.com" },
+        password: { label: "Password", type: "text", placeholder: "test123" },
+      },
+
+      async authorize(credentials, req) {
+        const user = await prisma.user.findUnique({
+          where: { email: credentials?.email },
+        });
+
+        if (credentials?.password === user?.password) {
+          console.log("authorize fn", { credentials, user });
+          return user;
+        } else {
+          return null;
+        }
+      },
+    }),
   ],
+  callbacks: {
+    session: ({ session, token }) => {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.sub,
+        },
+      };
+    },
+    jwt({ token }) {
+      return token;
+    },
+  },
   secret: env.JWT_SECRET,
+  session: {
+    strategy: "jwt",
+  },
 };
 
 /**

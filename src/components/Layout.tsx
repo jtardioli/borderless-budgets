@@ -113,6 +113,15 @@ const Layout: FC<Props> = ({ children }) => {
             <h2 className="mt-[2px] hidden text-lg lg:block">Year In Review</h2>
           </div>
         </Link>
+        <Link href="/transactions">
+          <div className="flex justify-center  py-2">
+            <MdOutlineCurrencyExchange
+              size={30}
+              className="text-indigo-600 lg:mr-4"
+            />
+            <h2 className="mt-[2px] hidden text-lg lg:block">Transactions</h2>
+          </div>
+        </Link>
         <Link href="/settings">
           <div className="flex justify-center  py-2">
             <IoMdSettings size={30} className="text-indigo-600 lg:mr-4" />
