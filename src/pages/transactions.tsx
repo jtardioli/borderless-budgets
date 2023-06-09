@@ -148,7 +148,7 @@ const Transactions: NextPage = () => {
           </button>
           <div className="hidden h-screen w-[350px] xl:block"></div>
           <section
-            className={`fixed right-0 top-0 h-screen w-[330px] flex-col gap-6 bg-slate-100 px-4 py-[5vh] drop-shadow-md transition-transform duration-300 ${
+            className={`fixed right-0 top-0 flex h-screen w-[330px] flex-col gap-6 bg-slate-100 px-4 py-[5vh] drop-shadow-md transition-transform duration-300 ${
               isSearchFormVisible
                 ? "translate-x-0 transform"
                 : "translate-x-full transform"
