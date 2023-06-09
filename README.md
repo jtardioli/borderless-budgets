@@ -1,9 +1,11 @@
 # Borderless Budgets
 
 [Live App](https://borderless-budgets.josht.art)
+
 Login using test credentials
 
 email: test@test.com
+
 password: test123
 
 Introducing Borderless Budgets, a web app for digital nomads traveling in Brazil. It simplifies expense and income tracking across different currencies. Enter your finances in your preferred currency, and the app converts them automatically. With interactive charts and a yearly review feature, staying on top of your finances is effortless.
