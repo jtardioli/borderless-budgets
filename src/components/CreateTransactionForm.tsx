@@ -1,4 +1,9 @@
-import React, { useState, type ChangeEvent, type FormEvent } from "react";
+import React, {
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+  useEffect,
+} from "react";
 import { CurrencyCode } from "~/config/currencyExchange";
 import { type TransactionNew, TransactionType } from "~/schemas/transactions";
 import DatePicker from "react-datepicker";
@@ -9,11 +14,22 @@ import {
 } from "~/services/transactions";
 import { Oval } from "react-loading-icons";
 import { api } from "~/config/api";
+import { type ZodError, z } from "zod";
+
+const CreateTransactionFormSchema = z
+  .object({
+    description: z.string().min(1),
+    amount: z.string().refine((str) => !isNaN(Number(str)), {
+      message: "Amount must be a valid number",
+    }),
+  })
+  .nonstrict();
 
 const CreateTransactionForm = () => {
   const [formData, setFormData] = useState<TransactionNew>(
     getEmptyTransaction(TransactionType.EXPENSE)
   );
+  const [invalidFormFields, setInvalidFromFields] = useState<string[]>([]);
 
   const [formType, setFormType] = useState<TransactionType>(
     TransactionType.EXPENSE
@@ -23,6 +39,16 @@ const CreateTransactionForm = () => {
 
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target;
+
+    if (invalidFormFields.includes(name)) {
+      setInvalidFromFields((prev) => {
+        return [
+          ...prev.filter((currentInvalidField) => {
+            return currentInvalidField !== name;
+          }),
+        ];
+      });
+    }
 
     setFormData((prevState) => ({
       ...prevState,
@@ -41,6 +67,14 @@ const CreateTransactionForm = () => {
 
   function addExpense(e: FormEvent) {
     e.preventDefault();
+    const parsedSchema = CreateTransactionFormSchema.safeParse(formData);
+
+    if (!parsedSchema.success) {
+      setInvalidFromFields(
+        Object.keys(parsedSchema.error.flatten().fieldErrors)
+      );
+      return;
+    }
     const { description, category, amount, date, type, currency } = formData;
     createTx.mutate({
       description,
@@ -52,7 +86,7 @@ const CreateTransactionForm = () => {
     });
   }
   return (
-    <div className="h-[450px] flex-[1] flex-col overflow-hidden rounded-md border-[1px] border-gray-300 bg-white drop-shadow-sm ">
+    <div className=" flex-[1] flex-col overflow-hidden rounded-md border-[1px] border-gray-300 bg-white pb-2 drop-shadow-sm">
       <div className=" flex h-12  border-b-[1px] border-gray-300">
         <button
           className={`flex-1 ${
@@ -94,8 +128,9 @@ const CreateTransactionForm = () => {
           Invest
         </button>
       </div>
+
       <form
-        className="flex flex-col gap-4 px-4 py-2 text-gray-600"
+        className="mt-2 flex flex-col gap-2 px-4 py-2 text-gray-600"
         onSubmit={addExpense}
       >
         <div className="flex flex-col">
@@ -103,7 +138,11 @@ const CreateTransactionForm = () => {
             Description:
           </label>
           <input
-            className="h-[40px] rounded-md border-[1px] border-gray-500 px-2 shadow-inner outline-none"
+            className={`h-[40px] rounded-md border-[1px]   px-2 shadow-inner outline-none ${
+              invalidFormFields.includes("description")
+                ? "border-red-700"
+                : "border-gray-500"
+            }`}
             placeholder="Uber"
             type="text"
             id="description"
@@ -111,6 +150,11 @@ const CreateTransactionForm = () => {
             value={formData.description}
             onChange={handleChange}
           />
+          {invalidFormFields.includes("description") && (
+            <p className="ml-1 mt-1 text-xs text-red-700">
+              You must provide a valid description
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col">
@@ -136,11 +180,17 @@ const CreateTransactionForm = () => {
           <label className="mb-2 text-sm text-gray-500" htmlFor="amount">
             Amount:
           </label>
-          <div className="flex overflow-hidden rounded-md border-[1px] border-gray-500 bg-red-300">
+          <div
+            className={`flex overflow-hidden rounded-md border-[1px] ${
+              invalidFormFields.includes("description")
+                ? "border-red-700"
+                : "border-gray-500"
+            }`}
+          >
             <input
-              className="h-[40px] w-full   border-none  px-2 shadow-inner outline-none"
+              className="h-[40px] w-full   border-none  px-2 shadow-inner outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
               placeholder="0.00"
-              type="text"
+              type="number"
               id="amount"
               name="amount"
               value={formData.amount === 0 ? "" : formData.amount}
@@ -148,7 +198,6 @@ const CreateTransactionForm = () => {
             />
             <select
               className="w-24 cursor-pointer border-none bg-gradient-to-br from-indigo-600 to-indigo-500 text-center text-white shadow-inner outline-none"
-              defaultValue={CurrencyCode.CAD}
               id="currency"
               name="currency"
               value={formData.currency}
@@ -163,6 +212,11 @@ const CreateTransactionForm = () => {
               })}
             </select>
           </div>
+          {invalidFormFields.includes("amount") && (
+            <p className="ml-1 mt-1 text-xs text-red-700">
+              You must provide a valid amount
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col">
@@ -188,7 +242,7 @@ const CreateTransactionForm = () => {
               ? "Adding investments do not affect your balance, they are simply a means of tracking your cost basis"
               : ""
           }
-          className="flex h-10 items-center justify-center rounded-md bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 shadow-inner"
+          className="mt-4 flex h-10 items-center justify-center  rounded-md bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-opacity-90 shadow-inner"
           disabled={createTx.isLoading}
         >
           {createTx.isLoading ? <Oval width="28px" /> : `Add ${formType}`}

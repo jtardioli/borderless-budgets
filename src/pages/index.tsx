@@ -1,7 +1,7 @@
 import { useRef } from "react";
 
 import { type NextPage } from "next";
-import { api } from "~/config/api";
+import { api } from "../config/api";
 import { TransactionType } from "~/schemas/transactions";
 import { formatCurrency } from "~/utils/currency";
 import { useSession } from "next-auth/react";
