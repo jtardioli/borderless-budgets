@@ -20,7 +20,7 @@ Introducing Borderless Budgets, a web app for digital nomads traveling in Brazil
 * Rest assured of the functionality of transaction additions, as it has been rigorously tested using Jest.
 
 ![image](https://github.com/jtardioli/borderless-budgets/assets/85530348/3f9f7985-b3c0-4589-9337-5539364da9a2)
-![image](https://github.com/jtardioli/borderless-budgets/assets/85530348/679b354f-e7e1-48dc-b86e-5cef0cd42bba)
+![image](https://github.com/jtardioli/borderless-budgets/assets/85530348/0228f0cb-b370-4bec-95b9-249554813096)
 ![image](https://github.com/jtardioli/borderless-budgets/assets/85530348/afd74329-c3aa-4cb6-acf5-452ad2fd56a6)
 
 
